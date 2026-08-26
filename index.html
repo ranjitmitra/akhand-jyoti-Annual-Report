@@ -242,25 +242,39 @@ body{
     if(n > 1 && n < total){
       const edge = Math.max(22, Math.round(canvas.width * 0.055));
 
-      const g = ctx.createLinearGradient(
-        n % 2 === 1 ? canvas.width - edge : 0,
-        0,
-        n % 2 === 1 ? canvas.width : edge,
-        0
-      );
+      /*
+        PageFlip's open spread is:
+          even PDF page  -> LEFT side
+          odd PDF page   -> RIGHT side
 
-      if(n % 2 === 1){
-        // Odd interior page = left page: shade its right edge.
+        Therefore:
+          LEFT page  = shade its RIGHT edge
+          RIGHT page = shade its LEFT edge
+      */
+
+      if(n % 2 === 0){
+        // LEFT page: 10% gradient on its RIGHT edge.
+        const g = ctx.createLinearGradient(
+          canvas.width - edge, 0,
+          canvas.width, 0
+        );
         g.addColorStop(0, "rgba(0,0,0,0)");
         g.addColorStop(0.72, "rgba(0,0,0,0.035)");
         g.addColorStop(1, "rgba(0,0,0,0.10)");
+
         ctx.fillStyle = g;
-        ctx.fillRect(canvas.width-edge, 0, edge, canvas.height);
+        ctx.fillRect(canvas.width - edge, 0, edge, canvas.height);
+
       }else{
-        // Even interior page = right page: shade its left edge.
+        // RIGHT page: 10% gradient on its LEFT edge.
+        const g = ctx.createLinearGradient(
+          0, 0,
+          edge, 0
+        );
         g.addColorStop(0, "rgba(0,0,0,0.10)");
         g.addColorStop(0.28, "rgba(0,0,0,0.035)");
         g.addColorStop(1, "rgba(0,0,0,0)");
+
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, edge, canvas.height);
       }
