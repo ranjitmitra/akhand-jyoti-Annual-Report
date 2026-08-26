@@ -117,6 +117,24 @@ body{
   min-width:100px;text-align:center;
   color:#ddd;font-size:12px;
 }
+.pageInput{
+  width:52px;
+  height:34px;
+  border:0;
+  border-radius:6px;
+  background:#fff;
+  color:#222;
+  text-align:center;
+  font-size:12px;
+  outline:none;
+}
+.pageInput:focus{
+  box-shadow:0 0 0 2px rgba(255,255,255,.45);
+}
+.goPage{
+  width:38px;
+  font-size:11px;
+}
 #zoomReset{width:48px;font-size:11px}
 #loading{
   position:fixed;inset:0;z-index:5000;
@@ -157,6 +175,8 @@ body{
 <div id="controls">
   <button id="prev" class="ctrl">‹</button>
   <div id="info">Cover</div>
+  <input id="pageInput" class="pageInput" type="number" min="1" value="1" aria-label="Go to page">
+  <button id="goPage" class="ctrl goPage" title="Go to page">Go</button>
   <button id="next" class="ctrl">›</button>
   <button id="zoomOut" class="ctrl">−</button>
   <button id="zoomReset" class="ctrl">100%</button>
@@ -192,6 +212,8 @@ body{
   const errorBox = document.getElementById("error");
   const errorText = document.getElementById("errorText");
   const info = document.getElementById("info");
+  const pageInput = document.getElementById("pageInput");
+  const goPage = document.getElementById("goPage");
 
   const prev = document.getElementById("prev");
   const next = document.getElementById("next");
@@ -242,39 +264,25 @@ body{
     if(n > 1 && n < total){
       const edge = Math.max(22, Math.round(canvas.width * 0.055));
 
-      /*
-        PageFlip's open spread is:
-          even PDF page  -> LEFT side
-          odd PDF page   -> RIGHT side
+      const g = ctx.createLinearGradient(
+        n % 2 === 1 ? canvas.width - edge : 0,
+        0,
+        n % 2 === 1 ? canvas.width : edge,
+        0
+      );
 
-        Therefore:
-          LEFT page  = shade its RIGHT edge
-          RIGHT page = shade its LEFT edge
-      */
-
-      if(n % 2 === 0){
-        // LEFT page: 10% gradient on its RIGHT edge.
-        const g = ctx.createLinearGradient(
-          canvas.width - edge, 0,
-          canvas.width, 0
-        );
+      if(n % 2 === 1){
+        // Odd interior page = left page: shade its right edge.
         g.addColorStop(0, "rgba(0,0,0,0)");
         g.addColorStop(0.72, "rgba(0,0,0,0.035)");
         g.addColorStop(1, "rgba(0,0,0,0.10)");
-
         ctx.fillStyle = g;
-        ctx.fillRect(canvas.width - edge, 0, edge, canvas.height);
-
+        ctx.fillRect(canvas.width-edge, 0, edge, canvas.height);
       }else{
-        // RIGHT page: 10% gradient on its LEFT edge.
-        const g = ctx.createLinearGradient(
-          0, 0,
-          edge, 0
-        );
+        // Even interior page = right page: shade its left edge.
         g.addColorStop(0, "rgba(0,0,0,0.10)");
         g.addColorStop(0.28, "rgba(0,0,0,0.035)");
         g.addColorStop(1, "rgba(0,0,0,0)");
-
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, edge, canvas.height);
       }
@@ -320,6 +328,8 @@ body{
     next.disabled = last;
     nextEdge.disabled = last;
 
+    pageInput.value = Math.min(total, Math.max(1, index + 1));
+
   }
 
   function goNext(){
@@ -329,6 +339,35 @@ body{
   function goPrev(){
     if(flip) flip.flipPrev("bottom");
   }
+
+  function goToPage(){
+    if(!flip || !total) return;
+
+    let requested = parseInt(pageInput.value,10);
+    if(!Number.isFinite(requested)) requested = 1;
+
+    requested = Math.max(1, Math.min(total, requested));
+
+    pageInput.value = requested;
+
+    // PageFlip uses a zero-based page index.
+    flip.flip(requested - 1, "bottom");
+  }
+
+  goPage.onclick = goToPage;
+
+  pageInput.addEventListener("keydown", function(e){
+    if(e.key === "Enter"){
+      e.preventDefault();
+      goToPage();
+    }
+  });
+
+  pageInput.addEventListener("change", function(){
+    let n = parseInt(this.value,10);
+    if(!Number.isFinite(n)) n = 1;
+    this.value = Math.max(1, Math.min(total || 1, n));
+  });
 
   prev.onclick = goPrev;
   prevEdge.onclick = goPrev;
