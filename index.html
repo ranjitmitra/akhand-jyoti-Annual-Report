@@ -31,6 +31,42 @@ body{
 #book{
   position:relative;
   margin:auto;
+  background:#fff;
+  overflow:visible;
+  isolation:isolate;
+}
+
+/*
+  Continuous magazine spine.
+  This sits BEHIND the PageFlip canvas, so the turning page
+  naturally covers it during the animation.
+*/
+#book::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:0;
+  width:28px;
+  height:100%;
+  transform:translateX(-50%);
+  pointer-events:none;
+  z-index:0;
+  background:linear-gradient(
+    90deg,
+    rgba(0,0,0,0) 0%,
+    rgba(0,0,0,.025) 18%,
+    rgba(0,0,0,.10) 42%,
+    rgba(0,0,0,.16) 50%,
+    rgba(0,0,0,.10) 58%,
+    rgba(0,0,0,.025) 82%,
+    rgba(0,0,0,0) 100%
+  );
+}
+
+/* PageFlip surface stays above the spine shadow. */
+#book canvas{
+  position:relative;
+  z-index:1;
 }
 .page{
   background:#fff;
