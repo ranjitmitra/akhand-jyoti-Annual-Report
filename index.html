@@ -271,19 +271,36 @@ body{
         0
       );
 
-      if(n % 2 === 1){
-        // Odd interior page = left page: shade its right edge.
-        g.addColorStop(0, "rgba(0,0,0,0)");
-        g.addColorStop(0.72, "rgba(0,0,0,0.035)");
-        g.addColorStop(1, "rgba(0,0,0,0.10)");
-        ctx.fillStyle = g;
+      /*
+        PageFlip's showCover=true makes PDF page 2 the FIRST
+        left-hand inside page. Therefore:
+          even PDF page -> LEFT side -> shade RIGHT edge
+          odd PDF page  -> RIGHT side -> shade LEFT edge
+      */
+      if(n % 2 === 0){
+        // LEFT page: 10% gradient on its RIGHT/spine edge.
+        const leftGradient = ctx.createLinearGradient(
+          canvas.width-edge, 0,
+          canvas.width, 0
+        );
+        leftGradient.addColorStop(0, "rgba(0,0,0,0)");
+        leftGradient.addColorStop(0.72, "rgba(0,0,0,0.035)");
+        leftGradient.addColorStop(1, "rgba(0,0,0,0.10)");
+
+        ctx.fillStyle = leftGradient;
         ctx.fillRect(canvas.width-edge, 0, edge, canvas.height);
+
       }else{
-        // Even interior page = right page: shade its left edge.
-        g.addColorStop(0, "rgba(0,0,0,0.10)");
-        g.addColorStop(0.28, "rgba(0,0,0,0.035)");
-        g.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.fillStyle = g;
+        // RIGHT page: 10% gradient on its LEFT/spine edge.
+        const rightGradient = ctx.createLinearGradient(
+          0, 0,
+          edge, 0
+        );
+        rightGradient.addColorStop(0, "rgba(0,0,0,0.10)");
+        rightGradient.addColorStop(0.28, "rgba(0,0,0,0.035)");
+        rightGradient.addColorStop(1, "rgba(0,0,0,0)");
+
+        ctx.fillStyle = rightGradient;
         ctx.fillRect(0, 0, edge, canvas.height);
       }
     }
