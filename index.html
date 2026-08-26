@@ -1,403 +1,1133 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<meta name="google" content="notranslate">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Akhand Jyoti — Annual Report 2025–26</title>
 
-<!-- Open-source rendering/flip engines; no Heyzine dependency -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4.1.0/turn.min.js"></script>
-
 <style>
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden}
-body{
-  background:#f1f1f1;
-  font-family:Arial,Helvetica,sans-serif;
-  color:#222;
+:root{
+  --bg1:#3a3a3a;
+  --bg2:#181818;
+  --ui:rgba(22,22,22,.88);
+  --white:#fff;
 }
-#viewport{
-  position:fixed;inset:0;
+
+*{box-sizing:border-box}
+
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
   overflow:hidden;
+}
+
+body{
+  background:
+    radial-gradient(
+      ellipse at center 42%,
+      #454545 0%,
+      #2a2a2a 34%,
+      #151515 76%,
+      #0d0d0d 100%
+    );
+  color:var(--white);
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+#reader{
+  position:relative;
+  width:100%;
+  height:100%;
   display:flex;
   align-items:center;
   justify-content:center;
-  background:#f2f2f2;
-}
-#bookWrap{
-  position:relative;
-  transform-origin:center center;
-  transition:transform .18s ease;
-}
-#magazine{
-  position:relative;
-  background:#fff;
-}
-#magazine .page{
-  background:#fff;
   overflow:hidden;
 }
-#magazine .page img{
-  display:block;
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  user-select:none;
-  -webkit-user-drag:none;
-}
-#magazine .page.even{
-  box-shadow:inset -18px 0 24px -24px rgba(0,0,0,.55);
-}
-#magazine .page.odd{
-  box-shadow:inset 18px 0 24px -24px rgba(0,0,0,.55);
+
+#bookWrap{
+  position:relative;
+  width:min(94vw,1240px);
+  height:min(86vh,900px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
-/* magazine gutter */
-#gutter{
+#book{
+  position:relative;
+  margin:auto;
+  box-shadow:0 24px 55px rgba(0,0,0,.5);
+}
+
+/* Middle gutter shadow */
+#book.spread::after{
+  content:"";
   position:absolute;
   left:50%;
   top:0;
-  width:42px;
-  height:100%;
+  bottom:0;
+  width:34px;
   transform:translateX(-50%);
   pointer-events:none;
-  z-index:2000;
+  z-index:50;
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(0,0,0,.035) 18%,
+      rgba(0,0,0,.12) 50%,
+      rgba(0,0,0,.035) 82%,
+      transparent 100%
+    );
   opacity:0;
-  background:linear-gradient(90deg,
-    transparent 0%,
-    rgba(0,0,0,.035) 16%,
-    rgba(0,0,0,.10) 35%,
-    rgba(0,0,0,.20) 50%,
-    rgba(0,0,0,.10) 65%,
-    rgba(0,0,0,.035) 84%,
-    transparent 100%);
+  transition:opacity .2s ease;
 }
-#gutter.open{opacity:1}
 
-/* prominent arrows */
-.nav{
+#book.spread::after{
+  opacity:1;
+}
+
+.page{
+  background:#fff;
+  overflow:hidden;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);
+}
+
+.page img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:contain;
+  background:#fff;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+
+.page-cover{
+  box-shadow:0 10px 30px rgba(0,0,0,.22);
+}
+
+/* Loading */
+#loader{
   position:fixed;
+  inset:0;
+  z-index:1000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#171717;
+  transition:opacity .3s;
+}
+
+.loader-inner{
+  text-align:center;
+  color:#ddd;
+  font-size:13px;
+}
+
+.spinner{
+  width:34px;
+  height:34px;
+  margin:0 auto 13px;
+  border-radius:50%;
+  border:3px solid rgba(255,255,255,.18);
+  border-top-color:#fff;
+  animation:spin .8s linear infinite;
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg)}
+}
+
+#title{
+  position:fixed;
+  z-index:500;
+  top:12px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:13px;
+  font-weight:600;
+  color:rgba(255,255,255,.78);
+  pointer-events:none;
+  white-space:nowrap;
+}
+
+/* Prominent navigation */
+.edgeNav{
+  position:fixed;
+  z-index:700;
   top:50%;
-  width:62px;height:112px;
   transform:translateY(-50%);
-  z-index:5000;
-  border:1px solid rgba(0,0,0,.12);
-  border-radius:12px;
-  background:rgba(255,255,255,.88);
-  color:#222;
-  box-shadow:0 5px 22px rgba(0,0,0,.16);
-  font-size:58px;
+  width:58px;
+  height:116px;
+  border:0;
+  border-radius:14px;
+  background:rgba(18,18,18,.72);
+  color:#fff;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 7px 22px rgba(0,0,0,.32);
+  backdrop-filter:blur(8px);
+  transition:
+    background .2s,
+    opacity .2s,
+    transform .2s;
+}
+
+.edgeNav:hover{
+  background:rgba(40,40,40,.94);
+}
+
+.edgeNav:active{
+  transform:translateY(-50%) scale(.96);
+}
+
+.edgeNav span{
+  font-size:54px;
   font-weight:200;
   line-height:1;
-  cursor:pointer;
+  margin-top:-4px;
 }
-.nav:hover{background:#fff}
-.nav:disabled{opacity:.28;cursor:default}
-#prev{left:16px}
-#next{right:16px}
 
-/* bottom controls */
+#prevEdge{
+  left:18px;
+}
+
+#nextEdge{
+  right:18px;
+}
+
+.edgeNav.disabled{
+  opacity:.18;
+  pointer-events:none;
+}
+
+/* Bottom controls */
 #controls{
   position:fixed;
-  left:50%;bottom:14px;
+  z-index:800;
+  left:50%;
+  bottom:14px;
   transform:translateX(-50%);
-  z-index:6000;
-  display:flex;align-items:center;gap:5px;
+  display:flex;
+  align-items:center;
+  gap:6px;
   padding:7px 9px;
-  background:rgba(35,35,35,.92);
-  border-radius:9px;
-  box-shadow:0 8px 28px rgba(0,0,0,.25);
+  border-radius:12px;
+  background:var(--ui);
+  border:1px solid rgba(255,255,255,.13);
+  box-shadow:0 9px 28px rgba(0,0,0,.42);
+  backdrop-filter:blur(12px);
 }
-.ctrl{
-  width:37px;height:33px;
-  border:0;border-radius:6px;
-  background:#3b3b3b;color:#fff;
+
+.control{
+  width:38px;
+  height:35px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:7px;
+  background:#303030;
+  color:#fff;
   cursor:pointer;
+  font-size:16px;
 }
-.ctrl:hover{background:#505050}
+
+.control:hover{
+  background:#414141;
+}
+
 #pageInfo{
-  min-width:100px;text-align:center;
-  color:#ddd;font-size:12px;
+  min-width:95px;
+  text-align:center;
+  font-size:12px;
+  color:#ddd;
   font-variant-numeric:tabular-nums;
 }
-#zoomReset{width:50px;font-size:11px}
 
-/* loading */
-#loading{
-  position:fixed;inset:0;z-index:9000;
-  display:flex;align-items:center;justify-content:center;
-  background:#f2f2f2;color:#555;
+#zoomLabel{
+  width:48px;
+  font-size:11px;
 }
-.spinner{
-  width:34px;height:34px;border-radius:50%;
-  border:3px solid #ddd;border-top-color:#555;
-  animation:spin .8s linear infinite;
-  margin:0 auto 12px;
-}
-@keyframes spin{to{transform:rotate(360deg)}}
-#error{
-  position:fixed;inset:0;z-index:10000;
-  display:none;align-items:center;justify-content:center;
-  text-align:center;background:#f2f2f2;color:#555;padding:30px;
-}
-#error strong{display:block;color:#222;font-size:20px;margin-bottom:8px}
 
-@media(max-width:800px){
-  .nav{width:48px;height:84px;font-size:44px}
-  #prev{left:4px}#next{right:4px}
-  #controls{bottom:6px}
+#hint{
+  position:fixed;
+  z-index:500;
+  right:16px;
+  bottom:20px;
+  font-size:11px;
+  color:rgba(255,255,255,.38);
+}
+
+@media(max-width:850px){
+
+  #bookWrap{
+    width:100vw;
+    height:82vh;
+  }
+
+  .edgeNav{
+    width:46px;
+    height:92px;
+    border-radius:10px;
+  }
+
+  .edgeNav span{
+    font-size:42px;
+  }
+
+  #prevEdge{
+    left:6px;
+  }
+
+  #nextEdge{
+    right:6px;
+  }
+
+  #title{
+    font-size:11px;
+    max-width:88%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  #hint{
+    display:none;
+  }
+}
+
+@media(max-width:520px){
+
+  #controls{
+    bottom:7px;
+  }
+
+  .control{
+    width:34px;
+    height:33px;
+  }
+
+  #pageInfo{
+    min-width:74px;
+  }
 }
 </style>
 </head>
 
 <body>
-<div id="viewport">
+
+<div id="reader">
+
   <div id="bookWrap">
-    <div id="magazine"></div>
-    <div id="gutter"></div>
+
+    <div id="book"></div>
+
   </div>
+
 </div>
 
-<button id="prev" class="nav" disabled aria-label="Previous page">‹</button>
-<button id="next" class="nav" aria-label="Next page">›</button>
+<div id="title">
+  Akhand Jyoti — Annual Report 2025–26
+</div>
+
+
+<!-- Previous -->
+
+<button
+  id="prevEdge"
+  class="edgeNav disabled"
+  aria-label="Previous page"
+  title="Previous page"
+>
+  <span>‹</span>
+</button>
+
+
+<!-- Next -->
+
+<button
+  id="nextEdge"
+  class="edgeNav"
+  aria-label="Next page"
+  title="Next page"
+>
+  <span>›</span>
+</button>
+
+
+<!-- Controls -->
 
 <div id="controls">
-  <button id="prevCtrl" class="ctrl">‹</button>
-  <div id="pageInfo">Cover</div>
-  <button id="nextCtrl" class="ctrl">›</button>
-  <button id="zoomOut" class="ctrl">−</button>
-  <button id="zoomReset" class="ctrl">100%</button>
-  <button id="zoomIn" class="ctrl">+</button>
-  <button id="full" class="ctrl">⛶</button>
+
+  <button
+    class="control"
+    id="prev"
+    title="Previous page"
+  >
+    ‹
+  </button>
+
+  <div id="pageInfo">
+    Cover
+  </div>
+
+  <button
+    class="control"
+    id="next"
+    title="Next page"
+  >
+    ›
+  </button>
+
+  <button
+    class="control"
+    id="zoomOut"
+    title="Zoom out"
+  >
+    −
+  </button>
+
+  <button
+    class="control"
+    id="zoomLabel"
+    title="Reset zoom"
+  >
+    100%
+  </button>
+
+  <button
+    class="control"
+    id="zoomIn"
+    title="Zoom in"
+  >
+    +
+  </button>
+
+  <button
+    class="control"
+    id="full"
+    title="Fullscreen"
+  >
+    ⛶
+  </button>
+
 </div>
 
-<div id="loading">
-  <div>
+
+<div id="hint">
+  Drag a page corner or use the arrows
+</div>
+
+
+<!-- Loading -->
+
+<div id="loader">
+
+  <div class="loader-inner">
+
     <div class="spinner"></div>
-    <div id="loadingText">Opening annual report…</div>
+
+    <div id="loadText">
+      Preparing your annual report…
+    </div>
+
   </div>
+
 </div>
 
-<div id="error">
-  <div>
-    <strong>Unable to open the annual report</strong>
-    <div id="errorText"></div>
-  </div>
-</div>
 
-<script>
+<!-- Page Flip library -->
+<script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
+
+
+<script type="module">
+
+/* =========================================================
+   PDF.JS
+========================================================= */
+
+const pdfjsLib =
+  await import(
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs"
+  );
+
 pdfjsLib.GlobalWorkerOptions.workerSrc =
-  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs";
 
-const PDF_FILE = "./Annual%20report%2025-26_V2.pdf";
 
-let pdf=null, total=0, images=[];
-let zoom=1;
-let firstOpen=false;
-let animating=false;
-let pageW=596, pageH=842;
+/* =========================================================
+   YOUR PDF
+========================================================= */
 
-/*
-  The original supplied Heyzine configuration specifies:
-  MAGAZINE viewer, shadow, depth, center, zoom, and arrows.
-  This implementation uses the same magazine model but hosts
-  the PDF locally and does not call Heyzine.
-*/
+const PDF_FILE =
+  "Annual report 25-26_V2.pdf";
 
-const $mag = $("#magazine");
-const $wrap = $("#bookWrap");
-const $gutter = $("#gutter");
 
-function setText(t){$("#loadingText").text(t)}
+/* =========================================================
+   ELEMENTS
+========================================================= */
 
-function fit(){
-  const ratio=pageW/pageH;
-  const maxH=Math.min(innerHeight*.82,900);
-  const maxW=Math.min(innerWidth*.82,1280);
-  let h=maxH, w=h*ratio*2;
-  if(w>maxW){w=maxW;h=w/(ratio*2)}
-  $wrap.css({width:w+"px",height:h+"px"});
-  $mag.css({width:w+"px",height:h+"px"});
-  if(firstOpen) {
-    try{$mag.turn("size",w/2,h)}catch(e){}
-  } else {
-    try{$mag.turn("size",w/2,h)}catch(e){}
-  }
-  applyZoom();
+const book =
+  document.getElementById("book");
+
+const wrap =
+  document.getElementById("bookWrap");
+
+const loader =
+  document.getElementById("loader");
+
+const loadText =
+  document.getElementById("loadText");
+
+const info =
+  document.getElementById("pageInfo");
+
+const prev =
+  document.getElementById("prev");
+
+const next =
+  document.getElementById("next");
+
+const prevEdge =
+  document.getElementById("prevEdge");
+
+const nextEdge =
+  document.getElementById("nextEdge");
+
+const zoomIn =
+  document.getElementById("zoomIn");
+
+const zoomOut =
+  document.getElementById("zoomOut");
+
+const zoomLabel =
+  document.getElementById("zoomLabel");
+
+const full =
+  document.getElementById("full");
+
+
+/* =========================================================
+   VARIABLES
+========================================================= */
+
+let pdf = null;
+
+let pageFlip = null;
+
+let images = [];
+
+let zoom = 1;
+
+let total = 82;
+
+
+/* =========================================================
+   LOADING TEXT
+========================================================= */
+
+function setLoad(text){
+
+  loadText.textContent =
+    text;
+
 }
+
+
+/* =========================================================
+   RENDER PDF PAGE
+========================================================= */
+
+function render(n){
+
+  return pdf
+    .getPage(n)
+    .then(page => {
+
+      const scale = 1.25;
+
+      const viewport =
+        page.getViewport({
+          scale
+        });
+
+      const canvas =
+        document.createElement(
+          "canvas"
+        );
+
+      const ctx =
+        canvas.getContext(
+          "2d",
+          {
+            alpha:false
+          }
+        );
+
+      canvas.width =
+        Math.ceil(
+          viewport.width
+        );
+
+      canvas.height =
+        Math.ceil(
+          viewport.height
+        );
+
+      return page
+        .render({
+          canvasContext:ctx,
+          viewport
+        })
+        .promise
+        .then(() => {
+
+          return canvas.toDataURL(
+            "image/jpeg",
+            .9
+          );
+
+        });
+
+    });
+
+}
+
+
+/* =========================================================
+   CREATE PAGE
+========================================================= */
+
+function createPage(src,index){
+
+  const page =
+    document.createElement(
+      "div"
+    );
+
+  page.className =
+    "page";
+
+  const img =
+    document.createElement(
+      "img"
+    );
+
+  img.src =
+    src;
+
+  img.alt =
+    "Annual Report page "
+    + (index + 1);
+
+  page.appendChild(img);
+
+  book.appendChild(page);
+
+}
+
+
+/* =========================================================
+   UPDATE UI
+========================================================= */
+
+function update(index){
+
+  if(index === 0){
+
+    info.textContent =
+      "Cover";
+
+  }
+
+  else if(index === total - 1){
+
+    info.textContent =
+      "Back cover";
+
+  }
+
+  else{
+
+    const first =
+      index + 1;
+
+    const second =
+      Math.min(
+        index + 2,
+        total - 1
+      );
+
+    info.textContent =
+      `${first}–${second} / ${total}`;
+
+  }
+
+
+  book.classList.toggle(
+    "spread",
+    index > 0 &&
+    index < total - 1
+  );
+
+
+  const atStart =
+    index === 0;
+
+  const atEnd =
+    index === total - 1;
+
+
+  prev.disabled =
+    atStart;
+
+  prevEdge.classList.toggle(
+    "disabled",
+    atStart
+  );
+
+
+  next.disabled =
+    atEnd;
+
+  nextEdge.classList.toggle(
+    "disabled",
+    atEnd
+  );
+
+}
+
+
+/* =========================================================
+   ZOOM
+========================================================= */
 
 function applyZoom(){
-  $wrap.css("transform",`scale(${zoom})`);
-  $("#zoomReset").text(Math.round(zoom*100)+"%");
+
+  book.style.transform =
+    `scale(${zoom})`;
+
+  zoomLabel.textContent =
+    Math.round(
+      zoom * 100
+    ) + "%";
+
 }
 
-function renderPage(n, scale=1.45){
-  return pdf.getPage(n).then(p=>{
-    const vp=p.getViewport({scale});
-    const c=document.createElement("canvas");
-    c.width=Math.ceil(vp.width); c.height=Math.ceil(vp.height);
-    const ctx=c.getContext("2d",{alpha:false});
-    return p.render({canvasContext:ctx,viewport:vp}).promise.then(
-      ()=>c.toDataURL("image/jpeg",.94)
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function doNext(){
+
+  if(pageFlip){
+
+    pageFlip.flipNext(
+      "bottom"
     );
-  });
-}
 
-function addPages(){
-  $mag.empty();
-  images.forEach((src,i)=>{
-    const d=$("<div/>",{
-      class:"page "+(i%2?"odd":"even")
-    });
-    $("<img/>",{src:src,draggable:false}).appendTo(d);
-    d.appendTo($mag);
-  });
-}
-
-function updateUI(){
-  let p=1;
-  try{p=$mag.turn("page")}catch(e){}
-  const end=total;
-
-  const atStart=p<=1;
-  const atEnd=p>=end;
-
-  $("#prev,#prevCtrl").prop("disabled",atStart);
-  $("#next,#nextCtrl").prop("disabled",atEnd);
-
-  if(p<=1) $("#pageInfo").text("Cover");
-  else if(p>=end) $("#pageInfo").text("Back cover");
-  else {
-    const left=p%2===0?p:p-1;
-    $("#pageInfo").text(`${left}–${Math.min(left+1,end)} / ${end}`);
   }
 
-  $gutter.toggleClass("open",p>1 && p<end);
 }
 
-function createBook(){
-  const w=$wrap.width(), h=$wrap.height();
+
+function doPrev(){
+
+  if(pageFlip){
+
+    pageFlip.flipPrev(
+      "bottom"
+    );
+
+  }
+
+}
+
+
+prev.onclick =
+  doPrev;
+
+prevEdge.onclick =
+  doPrev;
+
+next.onclick =
+  doNext;
+
+nextEdge.onclick =
+  doNext;
+
+
+/* =========================================================
+   ZOOM CONTROLS
+========================================================= */
+
+zoomIn.onclick = () => {
+
+  zoom =
+    Math.min(
+      1.5,
+      zoom + .1
+    );
+
+  applyZoom();
+
+};
+
+
+zoomOut.onclick = () => {
+
+  zoom =
+    Math.max(
+      .8,
+      zoom - .1
+    );
+
+  applyZoom();
+
+};
+
+
+zoomLabel.onclick = () => {
+
+  zoom = 1;
+
+  applyZoom();
+
+};
+
+
+/* =========================================================
+   FULLSCREEN
+========================================================= */
+
+full.onclick =
+  async () => {
+
+    if(
+      !document.fullscreenElement
+    ){
+
+      await document
+        .documentElement
+        .requestFullscreen?.();
+
+    }
+
+    else{
+
+      await document
+        .exitFullscreen?.();
+
+    }
+
+  };
+
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    if(
+      event.key ===
+      "ArrowRight" ||
+      event.key ===
+      "PageDown"
+    ){
+
+      doNext();
+
+    }
+
+
+    if(
+      event.key ===
+      "ArrowLeft" ||
+      event.key ===
+      "PageUp"
+    ){
+
+      doPrev();
+
+    }
+
+
+    if(event.key === "+"){
+
+      zoom =
+        Math.min(
+          1.5,
+          zoom + .1
+        );
+
+      applyZoom();
+
+    }
+
+
+    if(event.key === "-"){
+
+      zoom =
+        Math.max(
+          .8,
+          zoom - .1
+        );
+
+      applyZoom();
+
+    }
+
+
+    if(event.key === "0"){
+
+      zoom = 1;
+
+      applyZoom();
+
+    }
+
+
+    if(
+      event.key.toLowerCase()
+      === "f"
+    ){
+
+      full.click();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   LOAD THE BOOK
+========================================================= */
+
+try{
+
+  pdf =
+    await pdfjsLib
+      .getDocument({
+        url:PDF_FILE
+      })
+      .promise;
+
+
+  total =
+    pdf.numPages;
+
+
+  setLoad(
+    `Preparing ${total} pages…`
+  );
+
+
+  /* Render every PDF page */
+
+  for(
+    let i = 1;
+    i <= total;
+    i++
+  ){
+
+    setLoad(
+      `Preparing page ${i} of ${total}…`
+    );
+
+    images.push(
+      await render(i)
+    );
+
+  }
+
+
+  /* Add pages to book */
+
+  images.forEach(
+    (src,index) => {
+
+      createPage(
+        src,
+        index
+      );
+
+    }
+  );
+
+
+  /* =======================================================
+     PAGE FLIP ENGINE
+  ======================================================= */
+
+  const PageFlip =
+    window.St.PageFlip;
+
+
+  if(!PageFlip){
+
+    throw new Error(
+      "Page flip library unavailable"
+    );
+
+  }
+
+
+  const aspect =
+    await pdf
+      .getPage(1)
+      .then(page =>
+        page.getViewport({
+          scale:1
+        })
+      );
+
+
+  pageFlip =
+    new PageFlip(
+      book,
+      {
+
+        width:
+          aspect.width,
+
+        height:
+          aspect.height,
+
+        size:
+          "stretch",
+
+        minWidth:
+          280,
+
+        maxWidth:
+          900,
+
+        minHeight:
+          396,
+
+        maxHeight:
+          1273,
+
+        drawShadow:
+          true,
+
+        maxShadowOpacity:
+          .42,
+
+        flippingTime:
+          780,
+
+        usePortrait:
+          true,
+
+        showCover:
+          true,
+
+        startPage:
+          0,
+
+        autoSize:
+          true,
+
+        mobileScrollSupport:
+          false,
+
+        swipeDistance:
+          35,
+
+        useMouseEvents:
+          true,
+
+        disableFlipByClick:
+          false
+
+      }
+    );
+
 
   /*
-    The initial cover is centered as a single page.
-    Once the first turn completes, the same page object
-    switches to the two-page magazine presentation.
+    Load the rendered PDF pages.
   */
-  $mag.turn({
-    width:w,
-    height:h,
-    display:"single",
-    acceleration:true,
-    gradients:true,
-    elevation:60,
-    duration:850,
-    autoCenter:true,
-    pages:total,
-    direction:"ltr",
-    when:{
-      turning:function(e,page){
-        if(animating) return;
-        const current=$mag.turn("page");
 
-        /* after the cover, let the magazine become a spread */
-        if(current===1 && page===2){
-          animating=true;
-          setTimeout(()=>{
-            firstOpen=true;
-            try{
-              $mag.turn("display","double");
-              $mag.turn("page",2);
-            }catch(err){}
-            animating=false;
-            updateUI();
-          },20);
-        }
-      },
-      turned:function(e,page){
-        updateUI();
-      }
+  pageFlip.loadFromHtml(
+    book.querySelectorAll(
+      ".page"
+    )
+  );
+
+
+  /* Page changed */
+
+  pageFlip.on(
+    "flip",
+    event => {
+
+      update(
+        event.data
+      );
+
     }
-  });
+  );
 
-  updateUI();
-}
 
-async function start(){
-  try{
-    const r=await fetch(PDF_FILE,{cache:"no-store"});
-    if(!r.ok) throw new Error("PDF returned HTTP "+r.status);
-    const buf=await r.arrayBuffer();
+  pageFlip.on(
+    "changeOrientation",
+    () => {
 
-    setText("Reading annual report…");
-    pdf=await pdfjsLib.getDocument({data:buf}).promise;
-    total=pdf.numPages;
+      update(
+        pageFlip
+          .getCurrentPageIndex()
+      );
 
-    const first=await pdf.getPage(1);
-    const vp=first.getViewport({scale:1});
-    pageW=vp.width; pageH=vp.height;
-
-    for(let i=1;i<=total;i++){
-      setText(`Preparing page ${i} of ${total}…`);
-      images.push(await renderPage(i));
     }
+  );
 
-    addPages();
-    createBook();
-    fit();
 
-    $("#loading").fadeOut(300);
-  }catch(e){
-    console.error(e);
-    $("#loading").hide();
-    $("#errorText").text(e.message||"Unable to load the PDF.");
-    $("#error").css("display","flex");
-  }
+  update(0);
+
+
+  /* Hide loader */
+
+  loader.style.opacity =
+    "0";
+
+  setTimeout(
+    () => {
+
+      loader.style.display =
+        "none";
+
+    },
+    320
+  );
+
+
 }
 
-/* Navigation */
-function nextPage(){
-  if(animating) return;
-  try{$mag.turn("next")}catch(e){}
+catch(error){
+
+  console.error(error);
+
+  setLoad(
+    "Unable to open the annual report."
+  );
+
+  document
+    .querySelector(
+      ".spinner"
+    )
+    .style.display =
+      "none";
+
 }
-function prevPage(){
-  if(animating) return;
-  try{$mag.turn("previous")}catch(e){}
-}
-$("#next,#nextCtrl").on("click",nextPage);
-$("#prev,#prevCtrl").on("click",prevPage);
 
-/* Keyboard */
-$(document).on("keydown",e=>{
-  if(e.key==="ArrowRight") nextPage();
-  if(e.key==="ArrowLeft") prevPage();
-});
-
-/* Zoom */
-$("#zoomIn").on("click",()=>{
-  zoom=Math.min(1.5,zoom+.1); applyZoom();
-});
-$("#zoomOut").on("click",()=>{
-  zoom=Math.max(.75,zoom-.1); applyZoom();
-});
-$("#zoomReset").on("click",()=>{
-  zoom=1; applyZoom();
-});
-
-/* Fullscreen */
-$("#full").on("click",async()=>{
-  try{
-    if(!document.fullscreenElement)
-      await document.documentElement.requestFullscreen();
-    else
-      await document.exitFullscreen();
-  }catch(e){}
-});
-
-window.addEventListener("resize",fit);
-start();
 </script>
+
 </body>
 </html>
