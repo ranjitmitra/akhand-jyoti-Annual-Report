@@ -19,14 +19,13 @@ html,body{
 }
 
 body{
-  background:
-    radial-gradient(
-      ellipse at center,
-      #414141 0%,
-      #292929 38%,
-      #151515 78%,
-      #0d0d0d 100%
-    );
+  background:radial-gradient(
+    ellipse at center,
+    #414141 0%,
+    #292929 38%,
+    #151515 78%,
+    #0d0d0d 100%
+  );
   color:#fff;
   font-family:Arial,Helvetica,sans-serif;
 }
@@ -58,11 +57,7 @@ body{
   justify-content:center;
 }
 
-/* -------------------------------------------------------
-   INTERIOR BOOK
-   The complete inside spread is already underneath the
-   cover before the cover starts moving.
-------------------------------------------------------- */
+/* ================= INTERIOR BOOK ================= */
 
 #flipbook{
   position:absolute;
@@ -97,26 +92,19 @@ body{
   -webkit-user-drag:none;
 }
 
-/* -------------------------------------------------------
-   FRONT COVER
-
-   The left edge of the cover is ALWAYS exactly on the
-   center spine of the book.
-
-   This prevents the cover -> spread jump.
-------------------------------------------------------- */
+/* ================= FRONT COVER ================= */
 
 #frontCover{
   position:absolute;
   z-index:50;
 
   top:50%;
-  left:50%;
+  left:25%;
 
   width:50%;
   height:100%;
 
-  transform:translateY(-50%);
+  transform:translate(0,-50%);
 
   transform-origin:left center;
   transform-style:preserve-3d;
@@ -141,14 +129,11 @@ body{
   height:100%;
   object-fit:contain;
   background:#fff;
-
   user-select:none;
   -webkit-user-drag:none;
-
   backface-visibility:hidden;
 }
 
-/* Spine-side cover shading */
 #frontCover::before{
   content:"";
   position:absolute;
@@ -158,18 +143,16 @@ body{
   bottom:0;
   width:30px;
 
-  background:
-    linear-gradient(
-      90deg,
-      rgba(0,0,0,.30),
-      rgba(0,0,0,.10),
-      transparent
-    );
+  background:linear-gradient(
+    90deg,
+    rgba(0,0,0,.30),
+    rgba(0,0,0,.10),
+    transparent
+  );
 
   pointer-events:none;
 }
 
-/* Outer-edge cover shading */
 #frontCover::after{
   content:"";
   position:absolute;
@@ -179,19 +162,18 @@ body{
   right:0;
   width:30px;
 
-  background:
-    linear-gradient(
-      90deg,
-      transparent,
-      rgba(0,0,0,.17)
-    );
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(0,0,0,.17)
+  );
 
   pointer-events:none;
 }
 
 #frontCover.opening{
   transform:
-    translateY(-50%)
+    translate(50%,-50%)
     rotateY(-180deg);
 
   box-shadow:
@@ -206,9 +188,7 @@ body{
   pointer-events:none;
 }
 
-/* -------------------------------------------------------
-   CENTRAL BOOK SPINE / GUTTER
-------------------------------------------------------- */
+/* ================= CENTRAL SPINE ================= */
 
 #gutter{
   position:absolute;
@@ -223,38 +203,32 @@ body{
   transform:translate(-50%,-50%);
 
   pointer-events:none;
-
   opacity:0;
 
-  background:
-    linear-gradient(
-      90deg,
-      rgba(0,0,0,0) 0%,
-      rgba(0,0,0,.035) 10%,
-      rgba(0,0,0,.11) 25%,
-      rgba(0,0,0,.25) 40%,
-      rgba(0,0,0,.35) 50%,
-      rgba(0,0,0,.25) 60%,
-      rgba(0,0,0,.11) 75%,
-      rgba(0,0,0,.035) 90%,
-      rgba(0,0,0,0) 100%
-    );
+  background:linear-gradient(
+    90deg,
+    rgba(0,0,0,0) 0%,
+    rgba(0,0,0,.035) 10%,
+    rgba(0,0,0,.11) 25%,
+    rgba(0,0,0,.25) 40%,
+    rgba(0,0,0,.35) 50%,
+    rgba(0,0,0,.25) 60%,
+    rgba(0,0,0,.11) 75%,
+    rgba(0,0,0,.035) 90%,
+    rgba(0,0,0,0) 100%
+  );
 
   transition:opacity .18s ease;
 }
 
 #gutter::after{
   content:"";
-
   position:absolute;
   top:0;
   bottom:0;
   left:50%;
-
   width:1px;
-
   transform:translateX(-50%);
-
   background:rgba(0,0,0,.18);
 }
 
@@ -266,9 +240,7 @@ body{
   opacity:0;
 }
 
-/* -------------------------------------------------------
-   TITLE
-------------------------------------------------------- */
+/* ================= TITLE ================= */
 
 #title{
   position:fixed;
@@ -281,16 +253,13 @@ body{
 
   font-size:13px;
   font-weight:600;
-
   color:rgba(255,255,255,.76);
 
   white-space:nowrap;
   pointer-events:none;
 }
 
-/* -------------------------------------------------------
-   LARGE SIDE NAVIGATION
-------------------------------------------------------- */
+/* ================= LARGE NAVIGATION ================= */
 
 .edge{
   position:fixed;
@@ -306,12 +275,9 @@ body{
   border-radius:14px;
 
   background:rgba(18,18,18,.80);
-
   color:#fff;
 
-  box-shadow:
-    0 8px 25px rgba(0,0,0,.38);
-
+  box-shadow:0 8px 25px rgba(0,0,0,.38);
   backdrop-filter:blur(8px);
 
   cursor:pointer;
@@ -353,9 +319,7 @@ body{
   pointer-events:none;
 }
 
-/* -------------------------------------------------------
-   BOTTOM CONTROLS
-------------------------------------------------------- */
+/* ================= BOTTOM CONTROLS ================= */
 
 #controls{
   position:fixed;
@@ -375,12 +339,9 @@ body{
   border-radius:12px;
 
   background:rgba(24,24,24,.91);
-
   border:1px solid rgba(255,255,255,.14);
 
-  box-shadow:
-    0 10px 30px rgba(0,0,0,.42);
-
+  box-shadow:0 10px 30px rgba(0,0,0,.42);
   backdrop-filter:blur(12px);
 }
 
@@ -395,7 +356,6 @@ body{
   color:#fff;
 
   cursor:pointer;
-
   font-size:17px;
 }
 
@@ -410,13 +370,9 @@ body{
 
 #info{
   min-width:96px;
-
   text-align:center;
-
   font-size:12px;
-
   color:#ddd;
-
   font-variant-numeric:tabular-nums;
 }
 
@@ -425,30 +381,20 @@ body{
   font-size:11px;
 }
 
-/* -------------------------------------------------------
-   HINT
-------------------------------------------------------- */
-
 #hint{
   position:fixed;
   z-index:500;
-
   right:16px;
   bottom:20px;
-
   color:rgba(255,255,255,.38);
-
   font-size:11px;
 }
 
-/* -------------------------------------------------------
-   LOADING
-------------------------------------------------------- */
+/* ================= LOADING ================= */
 
 #loading{
   position:fixed;
   inset:0;
-
   z-index:1000;
 
   background:#151515;
@@ -481,32 +427,25 @@ body{
 }
 
 @keyframes spin{
-  to{
-    transform:rotate(360deg);
-  }
+  to{transform:rotate(360deg)}
 }
 
-/* -------------------------------------------------------
-   ERROR
-------------------------------------------------------- */
+/* ================= ERROR ================= */
 
 #error{
   display:none;
 
   position:fixed;
   inset:0;
-
   z-index:1100;
 
   align-items:center;
   justify-content:center;
 
   background:#151515;
-
   color:#ccc;
 
   text-align:center;
-
   padding:30px;
 }
 
@@ -514,9 +453,7 @@ body{
   color:#fff;
 }
 
-/* -------------------------------------------------------
-   RESPONSIVE
-------------------------------------------------------- */
+/* ================= RESPONSIVE ================= */
 
 @media(max-width:850px){
 
@@ -589,24 +526,20 @@ body{
 
     <div id="book">
 
-      <!--
-        The complete interior book is rendered BEFORE the cover moves.
-        Therefore no blank white rectangle can appear during opening.
-      -->
+      <!-- Interior pages are prepared underneath the cover -->
       <div id="flipbook"></div>
 
-      <!--
-        Physical front cover.
-        LEFT EDGE = EXACT CENTER OF BOOK.
-      -->
+      <!-- Dedicated physical front cover -->
       <div id="frontCover">
+
         <img
           id="coverImage"
           alt="Akhand Jyoti Annual Report cover"
         >
+
       </div>
 
-      <!-- Realistic central binding shadow -->
+      <!-- Physical magazine spine -->
       <div id="gutter"></div>
 
     </div>
@@ -647,53 +580,39 @@ body{
     id="prev"
     class="ctrl"
     title="Previous page"
-  >
-    ‹
-  </button>
+  >‹</button>
 
-  <div id="info">
-    Cover
-  </div>
+  <div id="info">Cover</div>
 
   <button
     id="next"
     class="ctrl"
     title="Next page"
-  >
-    ›
-  </button>
+  >›</button>
 
   <button
     id="zoomOut"
     class="ctrl"
     title="Zoom out"
-  >
-    −
-  </button>
+  >−</button>
 
   <button
     id="zoomLabel"
     class="ctrl"
     title="Reset zoom"
-  >
-    100%
-  </button>
+  >100%</button>
 
   <button
     id="zoomIn"
     class="ctrl"
     title="Zoom in"
-  >
-    +
-  </button>
+  >+</button>
 
   <button
     id="full"
     class="ctrl"
     title="Fullscreen"
-  >
-    ⛶
-  </button>
+  >⛶</button>
 
 </div>
 
@@ -719,9 +638,7 @@ body{
 
   <div>
 
-    <h3>
-      Unable to open the annual report
-    </h3>
+    <h3>Unable to open the annual report</h3>
 
     <p id="errorText"></p>
 
@@ -735,21 +652,12 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
   "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
 
-/* -------------------------------------------------------
-   CONFIGURATION
-------------------------------------------------------- */
-
 const PDF_FILE =
   "Annual%20report%2025-26_V2.pdf";
 
 const COVER_PAGE = 1;
-
 const FIRST_INTERIOR = 2;
 
-
-/* -------------------------------------------------------
-   ELEMENTS
-------------------------------------------------------- */
 
 const stage =
   document.getElementById("stage");
@@ -806,48 +714,66 @@ const full =
   document.getElementById("full");
 
 
-/* -------------------------------------------------------
-   STATE
-------------------------------------------------------- */
-
 let pdf = null;
-
 let flip = null;
-
 let totalPages = 0;
-
 let zoom = 1;
-
 let coverOpened = false;
-
 let interiorPageCount = 0;
 
 
-/* -------------------------------------------------------
-   HELPERS
-------------------------------------------------------- */
+/* ================= HELPERS ================= */
 
 function setLoading(text){
-
   loadingText.textContent = text;
-
 }
 
 
 function showError(message){
-
   loading.style.display = "none";
-
   errorText.textContent = message;
-
   errorBox.style.display = "flex";
-
 }
 
 
-/* -------------------------------------------------------
-   CREATE PAGE
-------------------------------------------------------- */
+/* ================= PDF RENDER ================= */
+
+async function renderPage(pageNumber,scale){
+
+  const page =
+    await pdf.getPage(pageNumber);
+
+  const viewport =
+    page.getViewport({
+      scale:scale
+    });
+
+  const canvas =
+    document.createElement("canvas");
+
+  const ctx =
+    canvas.getContext(
+      "2d",
+      {alpha:false}
+    );
+
+  canvas.width =
+    Math.ceil(viewport.width);
+
+  canvas.height =
+    Math.ceil(viewport.height);
+
+  await page.render({
+    canvasContext:ctx,
+    viewport:viewport
+  }).promise;
+
+  return canvas.toDataURL(
+    "image/jpeg",
+    .90
+  );
+}
+
 
 function makePage(dataUrl,pdfPageNumber){
 
@@ -868,66 +794,10 @@ function makePage(dataUrl,pdfPageNumber){
   div.appendChild(img);
 
   flipbook.appendChild(div);
-
 }
 
 
-/* -------------------------------------------------------
-   PDF RENDERING
-------------------------------------------------------- */
-
-async function renderPage(
-  pageNumber,
-  scale
-){
-
-  const page =
-    await pdf.getPage(pageNumber);
-
-  const viewport =
-    page.getViewport({
-      scale:scale
-    });
-
-  const canvas =
-    document.createElement("canvas");
-
-  const ctx =
-    canvas.getContext(
-      "2d",
-      {
-        alpha:false
-      }
-    );
-
-  canvas.width =
-    Math.ceil(viewport.width);
-
-  canvas.height =
-    Math.ceil(viewport.height);
-
-  await page.render({
-
-    canvasContext:ctx,
-
-    viewport:viewport
-
-  }).promise;
-
-  return canvas.toDataURL(
-    "image/jpeg",
-    .90
-  );
-
-}
-
-
-/* -------------------------------------------------------
-   CENTER GEOMETRY
-
-   The center of the two-page spread and the hinge of the
-   front cover use EXACTLY the same coordinate.
-------------------------------------------------------- */
+/* ================= CENTER GEOMETRY ================= */
 
 function setCenterGeometry(
   pageWidth,
@@ -971,6 +841,11 @@ function setCenterGeometry(
   stage.style.height =
     h + "px";
 
+  /*
+    One page is exactly half the open-book width.
+    Closed cover is centered in the viewport.
+  */
+
   frontCover.style.width =
     (w / 2) + "px";
 
@@ -979,13 +854,10 @@ function setCenterGeometry(
 
   gutter.style.height =
     h + "px";
-
 }
 
 
-/* -------------------------------------------------------
-   NAVIGATION DISPLAY
-------------------------------------------------------- */
+/* ================= NAVIGATION DISPLAY ================= */
 
 function updateNavigation(index){
 
@@ -1013,7 +885,6 @@ function updateNavigation(index){
     );
 
     return;
-
   }
 
 
@@ -1021,16 +892,12 @@ function updateNavigation(index){
     FIRST_INTERIOR + index;
 
 
-  if(
-    firstPdfPage >=
-    totalPages
-  ){
+  if(firstPdfPage >= totalPages){
 
     info.textContent =
       "Back cover";
 
-  }
-  else{
+  }else{
 
     const secondPdfPage =
       Math.min(
@@ -1044,7 +911,6 @@ function updateNavigation(index){
       secondPdfPage +
       " / " +
       totalPages;
-
   }
 
 
@@ -1052,74 +918,72 @@ function updateNavigation(index){
     index <= 0;
 
   const atEnd =
-    index >=
-    interiorPageCount - 1;
+    index >= interiorPageCount - 1;
 
 
   prev.disabled =
-    atStart;
+    false;
 
-  prevEdge.classList.toggle(
-    "disabled",
-    atStart
+  /*
+    At the first interior spread, Previous MUST remain
+    active because it returns to the front cover.
+  */
+  prevEdge.classList.remove(
+    "disabled"
   );
 
 
-  next.disabled =
-    atEnd;
+  if(atEnd){
 
-  nextEdge.classList.toggle(
-    "disabled",
-    atEnd
-  );
+    next.disabled = true;
+
+    nextEdge.classList.add(
+      "disabled"
+    );
+
+  }else{
+
+    next.disabled = false;
+
+    nextEdge.classList.remove(
+      "disabled"
+    );
+
+  }
 
 
-  if(
-    !atStart &&
-    !atEnd
-  ){
+  if(!atStart && !atEnd){
 
     gutter.classList.add(
       "visible"
     );
 
-  }
-  else{
+  }else{
 
     gutter.classList.remove(
       "visible"
     );
 
   }
-
 }
 
 
-/* -------------------------------------------------------
-   OPEN FRONT COVER
-
-   The interior spread is already underneath the cover.
-   The cover therefore never exposes a white placeholder.
-------------------------------------------------------- */
+/* ================= OPEN COVER ================= */
 
 function openCover(){
 
   if(coverOpened)
     return;
 
-  coverOpened =
-    true;
-
+  coverOpened = true;
 
   gutter.classList.add(
     "turning"
   );
 
-
   frontCover.classList.remove(
     "opened"
   );
-
 
   frontCover.classList.add(
     "opening"
@@ -1127,8 +991,8 @@ function openCover(){
 
 
   /*
-    Reveal the already-rendered spread shortly after the
-    physical cover begins turning.
+    The complete first interior spread already exists
+    underneath the cover.
   */
 
   setTimeout(function(){
@@ -1139,12 +1003,6 @@ function openCover(){
 
   },170);
 
-
-  /*
-    The 820ms cover movement and the 780ms interior turn
-    are deliberately very close, so the opening does not
-    feel like a different animation system.
-  */
 
   setTimeout(function(){
 
@@ -1159,42 +1017,33 @@ function openCover(){
     updateNavigation(0);
 
   },840);
-
 }
 
 
-/* -------------------------------------------------------
-   CLOSE FRONT COVER
-------------------------------------------------------- */
+/* ================= CLOSE COVER ================= */
 
 function closeCover(){
 
   if(!coverOpened)
     return;
 
-
   gutter.classList.add(
     "turning"
   );
-
 
   flipbook.classList.remove(
     "visible"
   );
 
-
   frontCover.classList.remove(
     "opened"
   );
 
-
   /*
-    Force a layout read so the browser cannot skip the
-    closed state before the reverse animation.
+    Force layout so the reverse animation is not skipped.
   */
 
   void frontCover.offsetWidth;
-
 
   frontCover.classList.remove(
     "opening"
@@ -1203,8 +1052,7 @@ function closeCover(){
 
   setTimeout(function(){
 
-    coverOpened =
-      false;
+    coverOpened = false;
 
     gutter.classList.remove(
       "turning"
@@ -1213,13 +1061,10 @@ function closeCover(){
     updateNavigation(0);
 
   },840);
-
 }
 
 
-/* -------------------------------------------------------
-   NEXT / PREVIOUS
-------------------------------------------------------- */
+/* ================= NAVIGATION ================= */
 
 function goNext(){
 
@@ -1228,7 +1073,6 @@ function goNext(){
     openCover();
 
     return;
-
   }
 
   if(flip){
@@ -1236,9 +1080,7 @@ function goNext(){
     flip.flipNext(
       "bottom"
     );
-
   }
-
 }
 
 
@@ -1247,6 +1089,12 @@ function goPrev(){
   if(!coverOpened)
     return;
 
+  /*
+    IMPORTANT:
+    When the interior engine is on its first page,
+    return to the front cover instead of attempting
+    another PageFlip operation.
+  */
 
   if(
     flip &&
@@ -1258,18 +1106,26 @@ function goPrev(){
     );
 
     return;
-
   }
 
-
   closeCover();
-
 }
 
 
-/* -------------------------------------------------------
-   BUTTON EVENTS
-------------------------------------------------------- */
+/* Cover click opens it */
+
+frontCover.addEventListener(
+  "click",
+  function(){
+
+    if(!coverOpened)
+      openCover();
+
+  }
+);
+
+
+/* Buttons */
 
 prev.onclick =
   goPrev;
@@ -1284,9 +1140,7 @@ nextEdge.onclick =
   goNext;
 
 
-/* -------------------------------------------------------
-   ZOOM
-------------------------------------------------------- */
+/* ================= ZOOM ================= */
 
 function setZoom(){
 
@@ -1298,9 +1152,7 @@ function setZoom(){
   zoomLabel.textContent =
     Math.round(
       zoom * 100
-    ) +
-    "%";
-
+    ) + "%";
 }
 
 
@@ -1335,31 +1187,25 @@ zoomOut.onclick =
 zoomLabel.onclick =
   function(){
 
-    zoom =
-      1;
+    zoom = 1;
 
     setZoom();
 
   };
 
 
-/* -------------------------------------------------------
-   FULLSCREEN
-------------------------------------------------------- */
+/* ================= FULLSCREEN ================= */
 
 full.onclick =
   async function(){
 
-    if(
-      !document.fullscreenElement
-    ){
+    if(!document.fullscreenElement){
 
       await document
         .documentElement
         .requestFullscreen?.();
 
-    }
-    else{
+    }else{
 
       await document
         .exitFullscreen?.();
@@ -1369,9 +1215,7 @@ full.onclick =
   };
 
 
-/* -------------------------------------------------------
-   KEYBOARD
-------------------------------------------------------- */
+/* ================= KEYBOARD ================= */
 
 document.addEventListener(
   "keydown",
@@ -1385,7 +1229,6 @@ document.addEventListener(
       e.preventDefault();
 
       goNext();
-
     }
 
 
@@ -1397,7 +1240,6 @@ document.addEventListener(
       e.preventDefault();
 
       goPrev();
-
     }
 
 
@@ -1414,18 +1256,13 @@ document.addEventListener(
 );
 
 
-/* -------------------------------------------------------
-   WINDOW RESIZE
-------------------------------------------------------- */
+/* ================= RESIZE ================= */
 
 window.addEventListener(
   "resize",
   function(){
 
-    if(
-      !pdf ||
-      !flip
-    )
+    if(!pdf || !flip)
       return;
 
     setZoom();
@@ -1434,9 +1271,7 @@ window.addEventListener(
 );
 
 
-/* -------------------------------------------------------
-   START
-------------------------------------------------------- */
+/* ================= START ================= */
 
 async function start(){
 
@@ -1446,11 +1281,6 @@ async function start(){
       "Loading PDF…"
     );
 
-
-    /*
-      Fetch explicitly so the filename containing spaces is
-      handled reliably on GitHub Pages.
-    */
 
     const response =
       await fetch(
@@ -1501,10 +1331,6 @@ async function start(){
     }
 
 
-    /*
-      Get the original PDF dimensions.
-    */
-
     const firstPage =
       await pdf.getPage(
         COVER_PAGE
@@ -1517,9 +1343,8 @@ async function start(){
 
 
     /*
-      IMPORTANT:
-      Establish the final centered spread geometry BEFORE
-      showing anything.
+      Establish the final centered open-book geometry
+      before anything becomes visible.
     */
 
     setCenterGeometry(
@@ -1528,14 +1353,11 @@ async function start(){
     );
 
 
-    /*
-      Render the front cover separately.
-    */
+    /* Render front cover separately */
 
     setLoading(
       "Preparing cover…"
     );
-
 
     coverImage.src =
       await renderPage(
@@ -1546,12 +1368,8 @@ async function start(){
 
     /*
       IMPORTANT:
-      Page 1 is NEVER loaded into StPageFlip.
-
-      The interior engine begins at PDF page 2.
-
-      Therefore normal page navigation can never jump
-      back to the front cover.
+      Page 1 is NOT part of PageFlip.
+      The interior engine starts at PDF page 2.
     */
 
     for(
@@ -1567,7 +1385,6 @@ async function start(){
         totalPages +
         "…"
       );
-
 
       makePage(
         await renderPage(
@@ -1599,13 +1416,8 @@ async function start(){
 
 
     /*
-      Interior page-flip engine.
-
-      showCover is FALSE intentionally.
-
-      The front cover is handled by the dedicated
-      physical cover above, eliminating the cover/spread
-      coordinate jump.
+      PageFlip controls ONLY the interior pages.
+      The front cover is controlled separately.
     */
 
     flip =
@@ -1731,11 +1543,6 @@ async function start(){
     );
 
 
-    /*
-      The interior is fully ready before the cover is
-      allowed to move.
-    */
-
     flipbook.classList.add(
       "ready"
     );
@@ -1775,7 +1582,6 @@ async function start(){
     );
 
   }
-
 }
 
 
