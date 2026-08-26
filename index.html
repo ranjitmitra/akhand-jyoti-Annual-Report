@@ -1,1297 +1,403 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<meta name="google" content="notranslate">
+<title>Akhand Jyoti — Annual Report 2025–26</title>
 
-<title>Akhand Jyoti Annual Report 2025–26</title>
-
-<!-- PDF rendering engine -->
+<!-- Open-source rendering/flip engines; no Heyzine dependency -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4.1.0/turn.min.js"></script>
 
 <style>
-/* =========================================================
-   VIEWER CSS
-========================================================= */
-
-* {
-    box-sizing: border-box;
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{
+  background:#f1f1f1;
+  font-family:Arial,Helvetica,sans-serif;
+  color:#222;
+}
+#viewport{
+  position:fixed;inset:0;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f2f2f2;
+}
+#bookWrap{
+  position:relative;
+  transform-origin:center center;
+  transition:transform .18s ease;
+}
+#magazine{
+  position:relative;
+  background:#fff;
+}
+#magazine .page{
+  background:#fff;
+  overflow:hidden;
+}
+#magazine .page img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+#magazine .page.even{
+  box-shadow:inset -18px 0 24px -24px rgba(0,0,0,.55);
+}
+#magazine .page.odd{
+  box-shadow:inset 18px 0 24px -24px rgba(0,0,0,.55);
 }
 
-html,
-body {
-    margin: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+/* magazine gutter */
+#gutter{
+  position:absolute;
+  left:50%;
+  top:0;
+  width:42px;
+  height:100%;
+  transform:translateX(-50%);
+  pointer-events:none;
+  z-index:2000;
+  opacity:0;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(0,0,0,.035) 16%,
+    rgba(0,0,0,.10) 35%,
+    rgba(0,0,0,.20) 50%,
+    rgba(0,0,0,.10) 65%,
+    rgba(0,0,0,.035) 84%,
+    transparent 100%);
 }
+#gutter.open{opacity:1}
 
-body {
-    background:
-        radial-gradient(
-            ellipse at center,
-            #f8f8f8 0%,
-            #eeeeee 55%,
-            #dedede 100%
-        );
-
-    font-family: Arial, sans-serif;
+/* prominent arrows */
+.nav{
+  position:fixed;
+  top:50%;
+  width:62px;height:112px;
+  transform:translateY(-50%);
+  z-index:5000;
+  border:1px solid rgba(0,0,0,.12);
+  border-radius:12px;
+  background:rgba(255,255,255,.88);
+  color:#222;
+  box-shadow:0 5px 22px rgba(0,0,0,.16);
+  font-size:58px;
+  font-weight:200;
+  line-height:1;
+  cursor:pointer;
 }
+.nav:hover{background:#fff}
+.nav:disabled{opacity:.28;cursor:default}
+#prev{left:16px}
+#next{right:16px}
 
-/* BOOK AREA */
-
-#reader {
-    position: fixed;
-    inset: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    overflow: hidden;
+/* bottom controls */
+#controls{
+  position:fixed;
+  left:50%;bottom:14px;
+  transform:translateX(-50%);
+  z-index:6000;
+  display:flex;align-items:center;gap:5px;
+  padding:7px 9px;
+  background:rgba(35,35,35,.92);
+  border-radius:9px;
+  box-shadow:0 8px 28px rgba(0,0,0,.25);
 }
-
-/* BOOK */
-
-#book {
-    position: relative;
-
-    width: min(88vw, 1250px);
-    height: min(86vh, 860px);
-
-    perspective: 2400px;
-
-    transform-style: preserve-3d;
-
-    transition: transform .25s ease;
+.ctrl{
+  width:37px;height:33px;
+  border:0;border-radius:6px;
+  background:#3b3b3b;color:#fff;
+  cursor:pointer;
 }
-
-/* NORMAL PAGES */
-
-.page {
-    position: absolute;
-
-    top: 0;
-
-    width: 50%;
-    height: 100%;
-
-    background: white;
-
-    overflow: hidden;
-
-    box-shadow:
-        0 4px 18px rgba(0,0,0,.18);
+.ctrl:hover{background:#505050}
+#pageInfo{
+  min-width:100px;text-align:center;
+  color:#ddd;font-size:12px;
+  font-variant-numeric:tabular-nums;
 }
+#zoomReset{width:50px;font-size:11px}
 
-.page img {
-    width: 100%;
-    height: 100%;
-
-    object-fit: contain;
-
-    display: block;
-
-    user-select: none;
-    -webkit-user-drag: none;
+/* loading */
+#loading{
+  position:fixed;inset:0;z-index:9000;
+  display:flex;align-items:center;justify-content:center;
+  background:#f2f2f2;color:#555;
 }
-
-/* LEFT */
-
-#leftPage {
-    left: 0;
+.spinner{
+  width:34px;height:34px;border-radius:50%;
+  border:3px solid #ddd;border-top-color:#555;
+  animation:spin .8s linear infinite;
+  margin:0 auto 12px;
 }
-
-/* RIGHT */
-
-#rightPage {
-    right: 0;
+@keyframes spin{to{transform:rotate(360deg)}}
+#error{
+  position:fixed;inset:0;z-index:10000;
+  display:none;align-items:center;justify-content:center;
+  text-align:center;background:#f2f2f2;color:#555;padding:30px;
 }
-
-/* =========================================================
-   FIRST / LAST SINGLE PAGE
-========================================================= */
-
-#singlePage {
-    position: absolute;
-
-    top: 0;
-    left: 25%;
-
-    width: 50%;
-    height: 100%;
-
-    background: white;
-
-    overflow: hidden;
-
-    transform-origin: left center;
-
-    transform-style: preserve-3d;
-
-    box-shadow:
-        0 4px 18px rgba(0,0,0,.18);
-
-    z-index: 100;
-}
-
-#singlePage img {
-    width: 100%;
-    height: 100%;
-
-    object-fit: contain;
-
-    display: block;
-}
-
-/* =========================================================
-   TURNING PAGE
-========================================================= */
-
-#turnPage {
-    position: absolute;
-
-    top: 0;
-
-    width: 50%;
-    height: 100%;
-
-    display: none;
-
-    z-index: 500;
-
-    transform-style: preserve-3d;
-
-    backface-visibility: hidden;
-}
-
-.turnSide {
-    position: absolute;
-
-    inset: 0;
-
-    background: white;
-
-    overflow: hidden;
-
-    backface-visibility: hidden;
-}
-
-.turnSide img {
-    width: 100%;
-    height: 100%;
-
-    object-fit: contain;
-
-    display: block;
-}
-
-/* BACK SIDE */
-
-.turnBack {
-    transform: rotateY(180deg);
-}
-
-/* =========================================================
-   CENTER BINDING SHADOW
-========================================================= */
-
-#binding {
-    position: absolute;
-
-    left: 50%;
-    top: 0;
-
-    width: 34px;
-    height: 100%;
-
-    transform: translateX(-50%);
-
-    pointer-events: none;
-
-    z-index: 800;
-
-    background:
-        linear-gradient(
-            90deg,
-            transparent,
-            rgba(0,0,0,.05),
-            rgba(0,0,0,.18),
-            rgba(0,0,0,.22),
-            rgba(0,0,0,.18),
-            rgba(0,0,0,.05),
-            transparent
-        );
-
-    opacity: 0;
-}
-
-#binding.visible {
-    opacity: 1;
-}
-
-/* =========================================================
-   NAVIGATION
-========================================================= */
-
-.nav {
-    position: fixed;
-
-    top: 50%;
-
-    transform: translateY(-50%);
-
-    width: 66px;
-    height: 116px;
-
-    border: 0;
-    border-radius: 12px;
-
-    background: rgba(35,35,35,.85);
-
-    color: white;
-
-    font-size: 58px;
-    font-weight: 200;
-
-    cursor: pointer;
-
-    z-index: 2000;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    transition:
-        background .2s,
-        opacity .2s,
-        transform .2s;
-}
-
-.nav:hover {
-    background: rgba(15,15,15,.95);
-}
-
-.nav:active {
-    transform:
-        translateY(-50%)
-        scale(.94);
-}
-
-#previous {
-    left: 18px;
-}
-
-#next {
-    right: 18px;
-}
-
-.nav.disabled {
-    opacity: .18;
-    pointer-events: none;
-}
-
-/* =========================================================
-   BOTTOM BAR
-========================================================= */
-
-#controls {
-    position: fixed;
-
-    left: 50%;
-    bottom: 16px;
-
-    transform: translateX(-50%);
-
-    z-index: 3000;
-
-    display: flex;
-    gap: 5px;
-
-    padding: 7px;
-
-    background: rgba(25,25,25,.92);
-
-    border-radius: 9px;
-}
-
-.control {
-    width: 38px;
-    height: 34px;
-
-    border: 0;
-    border-radius: 6px;
-
-    background: #333;
-
-    color: white;
-
-    cursor: pointer;
-}
-
-.control:hover {
-    background: #4a4a4a;
-}
-
-#pageInfo {
-    min-width: 100px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    color: #ddd;
-
-    font-size: 12px;
-}
-
-/* =========================================================
-   MOBILE
-========================================================= */
-
-@media(max-width:800px) {
-
-    #book {
-        width: 94vw;
-        height: 78vh;
-    }
-
-    .nav {
-        width: 48px;
-        height: 82px;
-
-        font-size: 42px;
-    }
-
-    #previous {
-        left: 4px;
-    }
-
-    #next {
-        right: 4px;
-    }
+#error strong{display:block;color:#222;font-size:20px;margin-bottom:8px}
+
+@media(max-width:800px){
+  .nav{width:48px;height:84px;font-size:44px}
+  #prev{left:4px}#next{right:4px}
+  #controls{bottom:6px}
 }
 </style>
 </head>
 
-
 <body>
-
-<div id="reader">
-
-    <div id="book">
-
-        <!-- LEFT PAGE -->
-        <div id="leftPage" class="page">
-            <img>
-        </div>
-
-        <!-- RIGHT PAGE -->
-        <div id="rightPage" class="page">
-            <img>
-        </div>
-
-        <!-- SINGLE COVER -->
-        <div id="singlePage">
-            <img>
-        </div>
-
-        <!-- ACTUAL TURNING PAGE -->
-        <div id="turnPage">
-
-            <div class="turnSide turnFront">
-                <img>
-            </div>
-
-            <div class="turnSide turnBack">
-                <img>
-            </div>
-
-        </div>
-
-        <!-- CENTER SHADOW -->
-        <div id="binding"></div>
-
-    </div>
-
+<div id="viewport">
+  <div id="bookWrap">
+    <div id="magazine"></div>
+    <div id="gutter"></div>
+  </div>
 </div>
 
-
-<!-- LARGE NAVIGATION -->
-
-<button
-    id="previous"
-    class="nav disabled"
->
-    ‹
-</button>
-
-<button
-    id="next"
-    class="nav"
->
-    ›
-</button>
-
-
-<!-- CONTROLS -->
+<button id="prev" class="nav" disabled aria-label="Previous page">‹</button>
+<button id="next" class="nav" aria-label="Next page">›</button>
 
 <div id="controls">
-
-    <button
-        id="prevControl"
-        class="control"
-    >
-        ‹
-    </button>
-
-    <div id="pageInfo">
-        Cover
-    </div>
-
-    <button
-        id="nextControl"
-        class="control"
-    >
-        ›
-    </button>
-
-    <button
-        id="zoomOut"
-        class="control"
-    >
-        −
-    </button>
-
-    <button
-        id="zoomReset"
-        class="control"
-    >
-        100%
-    </button>
-
-    <button
-        id="zoomIn"
-        class="control"
-    >
-        +
-    </button>
-
-    <button
-        id="fullscreen"
-        class="control"
-    >
-        ⛶
-    </button>
-
+  <button id="prevCtrl" class="ctrl">‹</button>
+  <div id="pageInfo">Cover</div>
+  <button id="nextCtrl" class="ctrl">›</button>
+  <button id="zoomOut" class="ctrl">−</button>
+  <button id="zoomReset" class="ctrl">100%</button>
+  <button id="zoomIn" class="ctrl">+</button>
+  <button id="full" class="ctrl">⛶</button>
 </div>
 
+<div id="loading">
+  <div>
+    <div class="spinner"></div>
+    <div id="loadingText">Opening annual report…</div>
+  </div>
+</div>
+
+<div id="error">
+  <div>
+    <strong>Unable to open the annual report</strong>
+    <div id="errorText"></div>
+  </div>
+</div>
 
 <script>
-
-/* =========================================================
-   JAVASCRIPT
-========================================================= */
-
 pdfjsLib.GlobalWorkerOptions.workerSrc =
-    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
+const PDF_FILE = "./Annual%20report%2025-26_V2.pdf";
 
-/*
-   YOUR PDF
-
-   It must be in the SAME GitHub folder
-   as this index.html.
-*/
-
-const PDF_FILE =
-    "./Annual%20report%2025-26_V2.pdf";
-
-
-const book =
-    document.getElementById("book");
-
-const leftPage =
-    document.getElementById("leftPage");
-
-const rightPage =
-    document.getElementById("rightPage");
-
-const singlePage =
-    document.getElementById("singlePage");
-
-const turnPage =
-    document.getElementById("turnPage");
-
-const binding =
-    document.getElementById("binding");
-
-const previous =
-    document.getElementById("previous");
-
-const next =
-    document.getElementById("next");
-
-const prevControl =
-    document.getElementById("prevControl");
-
-const nextControl =
-    document.getElementById("nextControl");
-
-const pageInfo =
-    document.getElementById("pageInfo");
-
-
-let pdf;
-
-let pages = [];
-
-let totalPages = 0;
-
+let pdf=null, total=0, images=[];
+let zoom=1;
+let firstOpen=false;
+let animating=false;
+let pageW=596, pageH=842;
 
 /*
-   State:
-
-   0  = cover
-
-   1  = pages 2–3
-
-   3  = pages 4–5
-
-   5  = pages 6–7
-
-   ...
-
-   last = back cover
+  The original supplied Heyzine configuration specifies:
+  MAGAZINE viewer, shadow, depth, center, zoom, and arrows.
+  This implementation uses the same magazine model but hosts
+  the PDF locally and does not call Heyzine.
 */
 
-let current = 0;
+const $mag = $("#magazine");
+const $wrap = $("#bookWrap");
+const $gutter = $("#gutter");
 
-let animating = false;
+function setText(t){$("#loadingText").text(t)}
 
-let zoom = 1;
-
-
-/* =========================================================
-   RENDER PDF PAGE
-========================================================= */
-
-async function renderPDFPage(number) {
-
-    const page =
-        await pdf.getPage(number);
-
-    const viewport =
-        page.getViewport({
-            scale: 1.6
-        });
-
-    const canvas =
-        document.createElement("canvas");
-
-    canvas.width =
-        viewport.width;
-
-    canvas.height =
-        viewport.height;
-
-    const ctx =
-        canvas.getContext("2d");
-
-    await page.render({
-        canvasContext: ctx,
-        viewport: viewport
-    }).promise;
-
-    return canvas.toDataURL(
-        "image/jpeg",
-        .95
-    );
+function fit(){
+  const ratio=pageW/pageH;
+  const maxH=Math.min(innerHeight*.82,900);
+  const maxW=Math.min(innerWidth*.82,1280);
+  let h=maxH, w=h*ratio*2;
+  if(w>maxW){w=maxW;h=w/(ratio*2)}
+  $wrap.css({width:w+"px",height:h+"px"});
+  $mag.css({width:w+"px",height:h+"px"});
+  if(firstOpen) {
+    try{$mag.turn("size",w/2,h)}catch(e){}
+  } else {
+    try{$mag.turn("size",w/2,h)}catch(e){}
+  }
+  applyZoom();
 }
 
-
-/* =========================================================
-   PUT PAGE IMAGE
-========================================================= */
-
-function setPage(element, index) {
-
-    const image =
-        element.querySelector("img");
-
-    if (
-        index >= 0 &&
-        index < pages.length
-    ) {
-
-        image.src =
-            pages[index];
-
-    } else {
-
-        image.removeAttribute("src");
-
-    }
+function applyZoom(){
+  $wrap.css("transform",`scale(${zoom})`);
+  $("#zoomReset").text(Math.round(zoom*100)+"%");
 }
 
-
-/* =========================================================
-   DISPLAY CURRENT STATE
-========================================================= */
-
-function displayState() {
-
-    leftPage.style.display =
-        "none";
-
-    rightPage.style.display =
-        "none";
-
-    singlePage.style.display =
-        "none";
-
-
-    /* COVER */
-
-    if (current === 0) {
-
-        setPage(
-            singlePage,
-            0
-        );
-
-        singlePage.style.display =
-            "block";
-
-        binding.classList.remove(
-            "visible"
-        );
-
-        pageInfo.textContent =
-            "Cover";
-
-    }
-
-
-    /* BACK COVER */
-
-    else if (
-        current ===
-        totalPages - 1
-    ) {
-
-        setPage(
-            singlePage,
-            totalPages - 1
-        );
-
-        singlePage.style.display =
-            "block";
-
-        binding.classList.remove(
-            "visible"
-        );
-
-        pageInfo.textContent =
-            "Back cover";
-
-    }
-
-
-    /* NORMAL SPREAD */
-
-    else {
-
-        setPage(
-            leftPage,
-            current
-        );
-
-        setPage(
-            rightPage,
-            current + 1
-        );
-
-        leftPage.style.display =
-            "block";
-
-        rightPage.style.display =
-            "block";
-
-        binding.classList.add(
-            "visible"
-        );
-
-        pageInfo.textContent =
-            `${current + 1} – ${current + 2} / ${totalPages}`;
-
-    }
-
-
-    updateButtons();
+function renderPage(n, scale=1.45){
+  return pdf.getPage(n).then(p=>{
+    const vp=p.getViewport({scale});
+    const c=document.createElement("canvas");
+    c.width=Math.ceil(vp.width); c.height=Math.ceil(vp.height);
+    const ctx=c.getContext("2d",{alpha:false});
+    return p.render({canvasContext:ctx,viewport:vp}).promise.then(
+      ()=>c.toDataURL("image/jpeg",.94)
+    );
+  });
 }
 
-
-/* =========================================================
-   BUTTON STATE
-========================================================= */
-
-function updateButtons() {
-
-    const first =
-        current === 0;
-
-    const last =
-        current ===
-        totalPages - 1;
-
-
-    previous.classList.toggle(
-        "disabled",
-        first
-    );
-
-    next.classList.toggle(
-        "disabled",
-        last
-    );
-
-
-    prevControl.disabled =
-        first;
-
-    nextControl.disabled =
-        last;
-}
-
-
-/* =========================================================
-   NEXT
-========================================================= */
-
-function goNext() {
-
-    if (
-        animating ||
-        current >= totalPages - 1
-    ) {
-        return;
-    }
-
-
-    animating = true;
-
-
-    /*
-       COVER → FIRST SPREAD
-
-       Page 1 is treated exactly like
-       every other turning page.
-    */
-
-    if (current === 0) {
-
-        setPage(
-            leftPage,
-            1
-        );
-
-        setPage(
-            rightPage,
-            2
-        );
-
-
-        leftPage.style.display =
-            "block";
-
-        rightPage.style.display =
-            "block";
-
-
-        setPage(
-            turnPage,
-            0
-        );
-
-
-        turnPage.style.display =
-            "block";
-
-        turnPage.style.left =
-            "25%";
-
-        turnPage.style.transformOrigin =
-            "left center";
-
-        turnPage.style.transform =
-            "rotateY(0deg)";
-
-        turnPage.style.transition =
-            "none";
-
-
-        singlePage.style.display =
-            "none";
-
-
-        void turnPage.offsetWidth;
-
-
-        turnPage.style.transition =
-            "transform .8s cubic-bezier(.22,.61,.36,1)";
-
-
-        requestAnimationFrame(() => {
-
-            turnPage.style.transform =
-                "rotateY(-180deg)";
-
-        });
-
-
-        setTimeout(() => {
-
-            turnPage.style.display =
-                "none";
-
-            current = 1;
-
-            displayState();
-
-            animating = false;
-
-        }, 820);
-
-
-        return;
-    }
-
-
-    /*
-       NORMAL SPREAD
-    */
-
-    const turningPage =
-        current + 1;
-
-    const newLeft =
-        current + 2;
-
-
-    setPage(
-        turnPage,
-        turningPage
-    );
-
-
-    setPage(
-        leftPage,
-        newLeft
-    );
-
-
-    leftPage.style.display =
-        "block";
-
-
-    turnPage.style.display =
-        "block";
-
-    turnPage.style.left =
-        "50%";
-
-    turnPage.style.transformOrigin =
-        "left center";
-
-    turnPage.style.transform =
-        "rotateY(0deg)";
-
-    turnPage.style.transition =
-        "none";
-
-
-    void turnPage.offsetWidth;
-
-
-    turnPage.style.transition =
-        "transform .8s cubic-bezier(.22,.61,.36,1)";
-
-
-    requestAnimationFrame(() => {
-
-        turnPage.style.transform =
-            "rotateY(-180deg)";
-
+function addPages(){
+  $mag.empty();
+  images.forEach((src,i)=>{
+    const d=$("<div/>",{
+      class:"page "+(i%2?"odd":"even")
     });
-
-
-    setTimeout(() => {
-
-        turnPage.style.display =
-            "none";
-
-        current += 2;
-
-        displayState();
-
-        animating = false;
-
-    }, 820);
+    $("<img/>",{src:src,draggable:false}).appendTo(d);
+    d.appendTo($mag);
+  });
 }
 
+function updateUI(){
+  let p=1;
+  try{p=$mag.turn("page")}catch(e){}
+  const end=total;
 
-/* =========================================================
-   PREVIOUS
-========================================================= */
+  const atStart=p<=1;
+  const atEnd=p>=end;
 
-function goPrevious() {
+  $("#prev,#prevCtrl").prop("disabled",atStart);
+  $("#next,#nextCtrl").prop("disabled",atEnd);
 
-    if (
-        animating ||
-        current <= 0
-    ) {
-        return;
-    }
+  if(p<=1) $("#pageInfo").text("Cover");
+  else if(p>=end) $("#pageInfo").text("Back cover");
+  else {
+    const left=p%2===0?p:p-1;
+    $("#pageInfo").text(`${left}–${Math.min(left+1,end)} / ${end}`);
+  }
 
-
-    animating = true;
-
-
-    /*
-       FIRST SPREAD → COVER
-    */
-
-    if (current === 1) {
-
-        setPage(
-            turnPage,
-            1
-        );
-
-
-        turnPage.style.display =
-            "block";
-
-        turnPage.style.left =
-            "0";
-
-        turnPage.style.transformOrigin =
-            "right center";
-
-        turnPage.style.transform =
-            "rotateY(0deg)";
-
-        turnPage.style.transition =
-            "none";
-
-
-        void turnPage.offsetWidth;
-
-
-        turnPage.style.transition =
-            "transform .8s cubic-bezier(.22,.61,.36,1)";
-
-
-        requestAnimationFrame(() => {
-
-            turnPage.style.transform =
-                "rotateY(180deg)";
-
-        });
-
-
-        setTimeout(() => {
-
-            turnPage.style.display =
-                "none";
-
-            current = 0;
-
-            displayState();
-
-            animating = false;
-
-        }, 820);
-
-
-        return;
-    }
-
-
-    /*
-       NORMAL BACKWARD TURN
-    */
-
-    const turningPage =
-        current;
-
-    const previousLeft =
-        current - 1;
-
-
-    setPage(
-        turnPage,
-        turningPage
-    );
-
-
-    setPage(
-        rightPage,
-        previousLeft
-    );
-
-
-    rightPage.style.display =
-        "block";
-
-
-    turnPage.style.display =
-        "block";
-
-    turnPage.style.left =
-        "0";
-
-    turnPage.style.transformOrigin =
-        "right center";
-
-    turnPage.style.transform =
-        "rotateY(0deg)";
-
-    turnPage.style.transition =
-        "none";
-
-
-    void turnPage.offsetWidth;
-
-
-    turnPage.style.transition =
-        "transform .8s cubic-bezier(.22,.61,.36,1)";
-
-
-    requestAnimationFrame(() => {
-
-        turnPage.style.transform =
-            "rotateY(180deg)";
-
-    });
-
-
-    setTimeout(() => {
-
-        turnPage.style.display =
-            "none";
-
-        current -= 2;
-
-        displayState();
-
-        animating = false;
-
-    }, 820);
+  $gutter.toggleClass("open",p>1 && p<end);
 }
 
+function createBook(){
+  const w=$wrap.width(), h=$wrap.height();
 
-/* =========================================================
-   BUTTONS
-========================================================= */
+  /*
+    The initial cover is centered as a single page.
+    Once the first turn completes, the same page object
+    switches to the two-page magazine presentation.
+  */
+  $mag.turn({
+    width:w,
+    height:h,
+    display:"single",
+    acceleration:true,
+    gradients:true,
+    elevation:60,
+    duration:850,
+    autoCenter:true,
+    pages:total,
+    direction:"ltr",
+    when:{
+      turning:function(e,page){
+        if(animating) return;
+        const current=$mag.turn("page");
 
-next.onclick =
-    goNext;
-
-nextControl.onclick =
-    goNext;
-
-previous.onclick =
-    goPrevious;
-
-prevControl.onclick =
-    goPrevious;
-
-
-/* =========================================================
-   KEYBOARD
-========================================================= */
-
-document.addEventListener(
-    "keydown",
-    event => {
-
-        if (
-            event.key === "ArrowRight"
-        ) {
-            goNext();
+        /* after the cover, let the magazine become a spread */
+        if(current===1 && page===2){
+          animating=true;
+          setTimeout(()=>{
+            firstOpen=true;
+            try{
+              $mag.turn("display","double");
+              $mag.turn("page",2);
+            }catch(err){}
+            animating=false;
+            updateUI();
+          },20);
         }
-
-        if (
-            event.key === "ArrowLeft"
-        ) {
-            goPrevious();
-        }
-
+      },
+      turned:function(e,page){
+        updateUI();
+      }
     }
-);
+  });
 
-
-/* =========================================================
-   ZOOM
-========================================================= */
-
-function applyZoom() {
-
-    book.style.transform =
-        `scale(${zoom})`;
-
-    document.getElementById(
-        "zoomReset"
-    ).textContent =
-        `${Math.round(zoom * 100)}%`;
+  updateUI();
 }
 
+async function start(){
+  try{
+    const r=await fetch(PDF_FILE,{cache:"no-store"});
+    if(!r.ok) throw new Error("PDF returned HTTP "+r.status);
+    const buf=await r.arrayBuffer();
 
-document.getElementById(
-    "zoomIn"
-).onclick = () => {
+    setText("Reading annual report…");
+    pdf=await pdfjsLib.getDocument({data:buf}).promise;
+    total=pdf.numPages;
 
-    zoom =
-        Math.min(
-            1.5,
-            zoom + .1
-        );
+    const first=await pdf.getPage(1);
+    const vp=first.getViewport({scale:1});
+    pageW=vp.width; pageH=vp.height;
 
-    applyZoom();
-};
-
-
-document.getElementById(
-    "zoomOut"
-).onclick = () => {
-
-    zoom =
-        Math.max(
-            .7,
-            zoom - .1
-        );
-
-    applyZoom();
-};
-
-
-document.getElementById(
-    "zoomReset"
-).onclick = () => {
-
-    zoom = 1;
-
-    applyZoom();
-};
-
-
-/* =========================================================
-   FULLSCREEN
-========================================================= */
-
-document.getElementById(
-    "fullscreen"
-).onclick = async () => {
-
-    if (!document.fullscreenElement) {
-
-        await document.documentElement
-            .requestFullscreen();
-
-    } else {
-
-        await document.exitFullscreen();
-
-    }
-};
-
-
-/* =========================================================
-   LOAD PDF
-========================================================= */
-
-async function loadBook() {
-
-    try {
-
-        const response =
-            await fetch(PDF_FILE);
-
-        if (!response.ok) {
-
-            throw new Error(
-                "PDF could not be loaded."
-            );
-
-        }
-
-        const buffer =
-            await response.arrayBuffer();
-
-
-        pdf =
-            await pdfjsLib
-                .getDocument({
-                    data: buffer
-                })
-                .promise;
-
-
-        totalPages =
-            pdf.numPages;
-
-
-        /*
-           Render all pages once.
-        */
-
-        for (
-            let i = 1;
-            i <= totalPages;
-            i++
-        ) {
-
-            pages.push(
-                await renderPDFPage(i)
-            );
-
-        }
-
-
-        displayState();
-
+    for(let i=1;i<=total;i++){
+      setText(`Preparing page ${i} of ${total}…`);
+      images.push(await renderPage(i));
     }
 
-    catch (error) {
+    addPages();
+    createBook();
+    fit();
 
-        document.body.innerHTML = `
-            <div style="
-                height:100vh;
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                background:#151515;
-                color:white;
-                font-family:Arial;
-                text-align:center;
-            ">
-                <div>
-                    <h2>Unable to open the annual report</h2>
-                    <p>${error.message}</p>
-                </div>
-            </div>
-        `;
-
-        console.error(error);
-    }
+    $("#loading").fadeOut(300);
+  }catch(e){
+    console.error(e);
+    $("#loading").hide();
+    $("#errorText").text(e.message||"Unable to load the PDF.");
+    $("#error").css("display","flex");
+  }
 }
 
+/* Navigation */
+function nextPage(){
+  if(animating) return;
+  try{$mag.turn("next")}catch(e){}
+}
+function prevPage(){
+  if(animating) return;
+  try{$mag.turn("previous")}catch(e){}
+}
+$("#next,#nextCtrl").on("click",nextPage);
+$("#prev,#prevCtrl").on("click",prevPage);
 
-loadBook();
+/* Keyboard */
+$(document).on("keydown",e=>{
+  if(e.key==="ArrowRight") nextPage();
+  if(e.key==="ArrowLeft") prevPage();
+});
 
+/* Zoom */
+$("#zoomIn").on("click",()=>{
+  zoom=Math.min(1.5,zoom+.1); applyZoom();
+});
+$("#zoomOut").on("click",()=>{
+  zoom=Math.max(.75,zoom-.1); applyZoom();
+});
+$("#zoomReset").on("click",()=>{
+  zoom=1; applyZoom();
+});
+
+/* Fullscreen */
+$("#full").on("click",async()=>{
+  try{
+    if(!document.fullscreenElement)
+      await document.documentElement.requestFullscreen();
+    else
+      await document.exitFullscreen();
+  }catch(e){}
+});
+
+window.addEventListener("resize",fit);
+start();
 </script>
-
 </body>
 </html>
