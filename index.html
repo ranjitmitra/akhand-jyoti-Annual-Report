@@ -4,141 +4,1784 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Akhand Jyoti — Annual Report 2025–26</title>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
+
 <style>
 *{box-sizing:border-box}
-html,body{width:100%;height:100%;margin:0;overflow:hidden}
-body{background:radial-gradient(ellipse at center,#414141 0%,#292929 38%,#151515 78%,#0d0d0d 100%);font-family:Arial,Helvetica,sans-serif;color:#fff}
-#reader{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
-#bookArea{position:relative;width:min(94vw,1200px);height:min(86vh,900px);display:flex;align-items:center;justify-content:center}
-#book{width:100%;height:100%;position:relative}
-.page{background:#fff;overflow:hidden}
-.page img{width:100%;height:100%;display:block;object-fit:contain;background:#fff;user-select:none;-webkit-user-drag:none}
 
-/* Open-book gutter. It sits under the page-flip layer, so it looks like a real binding. */
-#gutter{position:absolute;z-index:120;top:0;bottom:0;left:50%;width:44px;transform:translateX(-50%);pointer-events:none;opacity:0;transition:opacity .12s}
-#gutter:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.055) 18%,rgba(0,0,0,.20) 38%,rgba(0,0,0,.32) 50%,rgba(0,0,0,.20) 62%,rgba(0,0,0,.055) 82%,rgba(0,0,0,0))}
-#gutter:after{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;transform:translateX(-50%);background:rgba(0,0,0,.18)}
-#gutter.show{opacity:1}
-
-/* Cover mode is a separate full-page physical sheet. It uses the same 3D page-turn
-   direction and duration as the interior engine, rather than StPageFlip's hard-cover mode. */
-#coverStage{position:absolute;z-index:400;inset:0;display:block;pointer-events:none}
-#coverSheet{position:absolute;top:50%;left:50%;height:100%;width:auto;aspect-ratio:1/1.414;max-width:50%;transform:translate(-50%,-50%);}
-#coverSheet{background:#fff;box-shadow:0 18px 42px rgba(0,0,0,.45);transform-origin:left center;transform-style:preserve-3d;backface-visibility:hidden;will-change:transform}
-#coverSheet img{width:100%;height:100%;object-fit:contain;display:block}
-#coverSheet:after{content:"";position:absolute;top:0;bottom:0;right:0;width:20%;background:linear-gradient(90deg,transparent,rgba(0,0,0,.20));opacity:.25;pointer-events:none}
-#coverSheet.turnForward{animation:coverForward .78s cubic-bezier(.22,.72,.28,1) forwards}
-#coverSheet.turnBack{animation:coverBack .78s cubic-bezier(.22,.72,.28,1) forwards}
-@keyframes coverForward{
-  0%{transform:translate(-50%,-50%) perspective(1800px) rotateY(0deg);filter:brightness(1)}
-  42%{transform:translate(-50%,-50%) perspective(1800px) rotateY(62deg);filter:brightness(.90)}
-  100%{transform:translate(-100%,-50%) perspective(1800px) rotateY(180deg);filter:brightness(.72)}
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
 }
-@keyframes coverBack{
-  0%{transform:translate(-100%,-50%) perspective(1800px) rotateY(180deg);filter:brightness(.72)}
-  58%{transform:translate(-50%,-50%) perspective(1800px) rotateY(62deg);filter:brightness(.90)}
-  100%{transform:translate(-50%,-50%) perspective(1800px) rotateY(0deg);filter:brightness(1)}
-}
-#coverStage.hidden{display:none}
 
-#title{position:fixed;z-index:800;top:12px;left:50%;transform:translateX(-50%);font-size:13px;font-weight:600;color:rgba(255,255,255,.78);white-space:nowrap;pointer-events:none}
-.edge{position:fixed;z-index:900;top:50%;transform:translateY(-50%);width:62px;height:118px;border:0;border-radius:14px;background:rgba(18,18,18,.78);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 25px rgba(0,0,0,.38);backdrop-filter:blur(8px);transition:.18s}
-.edge:hover{background:rgba(48,48,48,.95)}.edge:active{transform:translateY(-50%) scale(.95)}
-.edge span{font-size:58px;font-weight:200;line-height:1}
-#prevEdge{left:16px}#nextEdge{right:16px}.edge.disabled{opacity:.18;pointer-events:none}
-#controls{position:fixed;z-index:950;bottom:14px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:7px 9px;border-radius:12px;background:rgba(24,24,24,.9);border:1px solid rgba(255,255,255,.14);box-shadow:0 10px 30px rgba(0,0,0,.42);backdrop-filter:blur(12px)}
-.ctrl{width:38px;height:35px;border:1px solid rgba(255,255,255,.13);border-radius:7px;background:#303030;color:#fff;cursor:pointer;font-size:17px}.ctrl:hover{background:#414141}.ctrl:disabled{opacity:.35;cursor:not-allowed}
-#info{min-width:96px;text-align:center;font-size:12px;color:#ddd;font-variant-numeric:tabular-nums}#zoomLabel{width:48px;font-size:11px}
-#hint{position:fixed;z-index:800;right:16px;bottom:20px;color:rgba(255,255,255,.38);font-size:11px}
-#loading{position:fixed;inset:0;z-index:1200;background:#151515;display:flex;align-items:center;justify-content:center;transition:opacity .3s}
-.loader{text-align:center;color:#ddd;font-size:13px}.spinner{width:34px;height:34px;margin:0 auto 14px;border-radius:50%;border:3px solid rgba(255,255,255,.18);border-top-color:#fff;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
-#error{display:none;position:fixed;inset:0;z-index:1300;align-items:center;justify-content:center;text-align:center;background:#151515;color:#ccc;padding:30px}.errorTitle{color:#fff}
-@media(max-width:850px){#bookArea{width:100vw;height:82vh}.edge{width:48px;height:92px}.edge span{font-size:44px}#prevEdge{left:5px}#nextEdge{right:5px}#hint{display:none}}
-@media(max-width:520px){#controls{bottom:7px}.ctrl{width:34px;height:33px}#info{min-width:76px}#title{font-size:11px;max-width:88%;overflow:hidden;text-overflow:ellipsis}}
+body{
+  background:
+    radial-gradient(
+      ellipse at center,
+      #414141 0%,
+      #292929 38%,
+      #151515 78%,
+      #0d0d0d 100%
+    );
+  color:#fff;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+#reader{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+#stage{
+  position:relative;
+  width:min(94vw,1240px);
+  height:min(86vh,900px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  perspective:1800px;
+}
+
+#book{
+  position:relative;
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* -------------------------------------------------------
+   INTERIOR BOOK
+   The complete inside spread is already underneath the
+   cover before the cover starts moving.
+------------------------------------------------------- */
+
+#flipbook{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  opacity:0;
+  visibility:hidden;
+  transition:opacity .12s ease;
+}
+
+#flipbook.ready{
+  visibility:visible;
+}
+
+#flipbook.visible{
+  opacity:1;
+}
+
+.page{
+  background:#fff;
+  overflow:hidden;
+}
+
+.page img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  background:#fff;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+
+/* -------------------------------------------------------
+   FRONT COVER
+
+   The left edge of the cover is ALWAYS exactly on the
+   center spine of the book.
+
+   This prevents the cover -> spread jump.
+------------------------------------------------------- */
+
+#frontCover{
+  position:absolute;
+  z-index:50;
+
+  top:50%;
+  left:50%;
+
+  width:50%;
+  height:100%;
+
+  transform:translateY(-50%);
+
+  transform-origin:left center;
+  transform-style:preserve-3d;
+
+  cursor:pointer;
+
+  box-shadow:
+    0 22px 45px rgba(0,0,0,.48),
+    7px 0 15px rgba(0,0,0,.22);
+
+  transition:
+    transform .82s cubic-bezier(.22,.72,.18,1),
+    box-shadow .82s ease,
+    opacity .08s linear .72s;
+
+  backface-visibility:hidden;
+}
+
+#frontCover img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  background:#fff;
+
+  user-select:none;
+  -webkit-user-drag:none;
+
+  backface-visibility:hidden;
+}
+
+/* Spine-side cover shading */
+#frontCover::before{
+  content:"";
+  position:absolute;
+  z-index:3;
+  left:0;
+  top:0;
+  bottom:0;
+  width:30px;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0,0,0,.30),
+      rgba(0,0,0,.10),
+      transparent
+    );
+
+  pointer-events:none;
+}
+
+/* Outer-edge cover shading */
+#frontCover::after{
+  content:"";
+  position:absolute;
+  z-index:4;
+  top:0;
+  bottom:0;
+  right:0;
+  width:30px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(0,0,0,.17)
+    );
+
+  pointer-events:none;
+}
+
+#frontCover.opening{
+  transform:
+    translateY(-50%)
+    rotateY(-180deg);
+
+  box-shadow:
+    -12px 22px 45px rgba(0,0,0,.25);
+
+  pointer-events:none;
+}
+
+#frontCover.opened{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+}
+
+/* -------------------------------------------------------
+   CENTRAL BOOK SPINE / GUTTER
+------------------------------------------------------- */
+
+#gutter{
+  position:absolute;
+  z-index:30;
+
+  top:50%;
+  left:50%;
+
+  width:38px;
+  height:100%;
+
+  transform:translate(-50%,-50%);
+
+  pointer-events:none;
+
+  opacity:0;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0,0,0,0) 0%,
+      rgba(0,0,0,.035) 10%,
+      rgba(0,0,0,.11) 25%,
+      rgba(0,0,0,.25) 40%,
+      rgba(0,0,0,.35) 50%,
+      rgba(0,0,0,.25) 60%,
+      rgba(0,0,0,.11) 75%,
+      rgba(0,0,0,.035) 90%,
+      rgba(0,0,0,0) 100%
+    );
+
+  transition:opacity .18s ease;
+}
+
+#gutter::after{
+  content:"";
+
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:50%;
+
+  width:1px;
+
+  transform:translateX(-50%);
+
+  background:rgba(0,0,0,.18);
+}
+
+#gutter.visible{
+  opacity:1;
+}
+
+#gutter.turning{
+  opacity:0;
+}
+
+/* -------------------------------------------------------
+   TITLE
+------------------------------------------------------- */
+
+#title{
+  position:fixed;
+  z-index:500;
+
+  top:11px;
+  left:50%;
+
+  transform:translateX(-50%);
+
+  font-size:13px;
+  font-weight:600;
+
+  color:rgba(255,255,255,.76);
+
+  white-space:nowrap;
+  pointer-events:none;
+}
+
+/* -------------------------------------------------------
+   LARGE SIDE NAVIGATION
+------------------------------------------------------- */
+
+.edge{
+  position:fixed;
+  z-index:700;
+
+  top:50%;
+  transform:translateY(-50%);
+
+  width:62px;
+  height:118px;
+
+  border:0;
+  border-radius:14px;
+
+  background:rgba(18,18,18,.80);
+
+  color:#fff;
+
+  box-shadow:
+    0 8px 25px rgba(0,0,0,.38);
+
+  backdrop-filter:blur(8px);
+
+  cursor:pointer;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  transition:
+    background .18s,
+    opacity .18s,
+    transform .18s;
+}
+
+.edge:hover{
+  background:rgba(48,48,48,.95);
+}
+
+.edge:active{
+  transform:translateY(-50%) scale(.95);
+}
+
+.edge span{
+  font-size:58px;
+  font-weight:200;
+  line-height:1;
+}
+
+#prevEdge{
+  left:16px;
+}
+
+#nextEdge{
+  right:16px;
+}
+
+.edge.disabled{
+  opacity:.18;
+  pointer-events:none;
+}
+
+/* -------------------------------------------------------
+   BOTTOM CONTROLS
+------------------------------------------------------- */
+
+#controls{
+  position:fixed;
+  z-index:800;
+
+  bottom:14px;
+  left:50%;
+
+  transform:translateX(-50%);
+
+  display:flex;
+  align-items:center;
+  gap:6px;
+
+  padding:7px 9px;
+
+  border-radius:12px;
+
+  background:rgba(24,24,24,.91);
+
+  border:1px solid rgba(255,255,255,.14);
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.42);
+
+  backdrop-filter:blur(12px);
+}
+
+.ctrl{
+  width:38px;
+  height:35px;
+
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:7px;
+
+  background:#303030;
+  color:#fff;
+
+  cursor:pointer;
+
+  font-size:17px;
+}
+
+.ctrl:hover{
+  background:#414141;
+}
+
+.ctrl:disabled{
+  opacity:.35;
+  cursor:not-allowed;
+}
+
+#info{
+  min-width:96px;
+
+  text-align:center;
+
+  font-size:12px;
+
+  color:#ddd;
+
+  font-variant-numeric:tabular-nums;
+}
+
+#zoomLabel{
+  width:48px;
+  font-size:11px;
+}
+
+/* -------------------------------------------------------
+   HINT
+------------------------------------------------------- */
+
+#hint{
+  position:fixed;
+  z-index:500;
+
+  right:16px;
+  bottom:20px;
+
+  color:rgba(255,255,255,.38);
+
+  font-size:11px;
+}
+
+/* -------------------------------------------------------
+   LOADING
+------------------------------------------------------- */
+
+#loading{
+  position:fixed;
+  inset:0;
+
+  z-index:1000;
+
+  background:#151515;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  transition:opacity .3s;
+}
+
+.loader{
+  text-align:center;
+  color:#ddd;
+  font-size:13px;
+}
+
+.spinner{
+  width:34px;
+  height:34px;
+
+  margin:0 auto 14px;
+
+  border-radius:50%;
+
+  border:3px solid rgba(255,255,255,.18);
+  border-top-color:#fff;
+
+  animation:spin .8s linear infinite;
+}
+
+@keyframes spin{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
+/* -------------------------------------------------------
+   ERROR
+------------------------------------------------------- */
+
+#error{
+  display:none;
+
+  position:fixed;
+  inset:0;
+
+  z-index:1100;
+
+  align-items:center;
+  justify-content:center;
+
+  background:#151515;
+
+  color:#ccc;
+
+  text-align:center;
+
+  padding:30px;
+}
+
+#error h3{
+  color:#fff;
+}
+
+/* -------------------------------------------------------
+   RESPONSIVE
+------------------------------------------------------- */
+
+@media(max-width:850px){
+
+  #stage{
+    width:100vw;
+    height:82vh;
+  }
+
+  #frontCover{
+    width:50%;
+    height:100%;
+  }
+
+  #gutter{
+    height:100%;
+  }
+
+  .edge{
+    width:48px;
+    height:92px;
+  }
+
+  .edge span{
+    font-size:44px;
+  }
+
+  #prevEdge{
+    left:5px;
+  }
+
+  #nextEdge{
+    right:5px;
+  }
+
+  #hint{
+    display:none;
+  }
+}
+
+@media(max-width:520px){
+
+  #controls{
+    bottom:7px;
+  }
+
+  .ctrl{
+    width:34px;
+    height:33px;
+  }
+
+  #info{
+    min-width:76px;
+  }
+
+  #title{
+    font-size:11px;
+    max-width:88%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+}
 </style>
 </head>
+
 <body>
+
 <div id="reader">
- <div id="bookArea">
-  <div id="book"></div>
-  <div id="gutter"></div>
-  <div id="coverStage"><div id="coverSheet"><img id="coverImg" alt="Annual Report cover"></div></div>
- </div>
+
+  <div id="stage">
+
+    <div id="book">
+
+      <!--
+        The complete interior book is rendered BEFORE the cover moves.
+        Therefore no blank white rectangle can appear during opening.
+      -->
+      <div id="flipbook"></div>
+
+      <!--
+        Physical front cover.
+        LEFT EDGE = EXACT CENTER OF BOOK.
+      -->
+      <div id="frontCover">
+        <img
+          id="coverImage"
+          alt="Akhand Jyoti Annual Report cover"
+        >
+      </div>
+
+      <!-- Realistic central binding shadow -->
+      <div id="gutter"></div>
+
+    </div>
+
+  </div>
+
 </div>
-<div id="title">Akhand Jyoti — Annual Report 2025–26</div>
-<button id="prevEdge" class="edge disabled"><span>‹</span></button>
-<button id="nextEdge" class="edge"><span>›</span></button>
+
+<div id="title">
+  Akhand Jyoti — Annual Report 2025–26
+</div>
+
+<!-- Prominent navigation -->
+
+<button
+  id="prevEdge"
+  class="edge disabled"
+  aria-label="Previous page"
+  title="Previous page"
+>
+  <span>‹</span>
+</button>
+
+<button
+  id="nextEdge"
+  class="edge"
+  aria-label="Next page"
+  title="Next page"
+>
+  <span>›</span>
+</button>
+
+<!-- Bottom controls -->
+
 <div id="controls">
- <button id="prev" class="ctrl">‹</button><div id="info">Cover</div><button id="next" class="ctrl">›</button>
- <button id="zoomOut" class="ctrl">−</button><button id="zoomLabel" class="ctrl">100%</button><button id="zoomIn" class="ctrl">+</button><button id="full" class="ctrl">⛶</button>
+
+  <button
+    id="prev"
+    class="ctrl"
+    title="Previous page"
+  >
+    ‹
+  </button>
+
+  <div id="info">
+    Cover
+  </div>
+
+  <button
+    id="next"
+    class="ctrl"
+    title="Next page"
+  >
+    ›
+  </button>
+
+  <button
+    id="zoomOut"
+    class="ctrl"
+    title="Zoom out"
+  >
+    −
+  </button>
+
+  <button
+    id="zoomLabel"
+    class="ctrl"
+    title="Reset zoom"
+  >
+    100%
+  </button>
+
+  <button
+    id="zoomIn"
+    class="ctrl"
+    title="Zoom in"
+  >
+    +
+  </button>
+
+  <button
+    id="full"
+    class="ctrl"
+    title="Fullscreen"
+  >
+    ⛶
+  </button>
+
 </div>
-<div id="hint">Drag a page corner or use the arrows</div>
-<div id="loading"><div class="loader"><div class="spinner"></div><div id="loadingText">Opening annual report…</div></div></div>
-<div id="error"><div><h3 class="errorTitle">Unable to open the annual report</h3><p id="errorText"></p></div></div>
+
+<div id="hint">
+  Drag the page corner or use the arrows
+</div>
+
+<div id="loading">
+
+  <div class="loader">
+
+    <div class="spinner"></div>
+
+    <div id="loadingText">
+      Opening annual report…
+    </div>
+
+  </div>
+
+</div>
+
+<div id="error">
+
+  <div>
+
+    <h3>
+      Unable to open the annual report
+    </h3>
+
+    <p id="errorText"></p>
+
+  </div>
+
+</div>
 
 <script>
-pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-const PDF_FILE="Annual%20report%2025-26_V2.pdf";
-const book=document.getElementById("book"),gutter=document.getElementById("gutter");
-const coverStage=document.getElementById("coverStage"),coverSheet=document.getElementById("coverSheet"),coverImg=document.getElementById("coverImg");
-const loading=document.getElementById("loading"),loadingText=document.getElementById("loadingText"),errorBox=document.getElementById("error"),errorText=document.getElementById("errorText");
-const info=document.getElementById("info"),prev=document.getElementById("prev"),next=document.getElementById("next"),prevEdge=document.getElementById("prevEdge"),nextEdge=document.getElementById("nextEdge");
-const zoomIn=document.getElementById("zoomIn"),zoomOut=document.getElementById("zoomOut"),zoomLabel=document.getElementById("zoomLabel"),full=document.getElementById("full");
-let pdf=null,total=0,flip=null,zoom=1,current=0,coverAnimating=false,images=[];
 
-function setLoading(t){loadingText.textContent=t}
-function showError(t){loading.style.display="none";errorText.textContent=t;errorBox.style.display="flex"}
-function makePage(src,index){const d=document.createElement("div");d.className="page"; if(src){const i=document.createElement("img");i.src=src;i.alt="Annual Report page "+(index+1);d.appendChild(i)} book.appendChild(d)}
-async function renderPage(n){const p=await pdf.getPage(n),v=p.getViewport({scale:1.35}),c=document.createElement("canvas"),ctx=c.getContext("2d",{alpha:false});c.width=Math.ceil(v.width);c.height=Math.ceil(v.height);await p.render({canvasContext:ctx,viewport:v}).promise;return c.toDataURL("image/jpeg",.90)}
-function updateNav(i){
- current=i;
- const start=i===0,end=i===total-1;
- info.textContent=start?"Cover":end?"Back cover":((i+1)+"–"+Math.min(i+2,total-1)+" / "+total);
- prev.disabled=start;next.disabled=end;prevEdge.classList.toggle("disabled",start);nextEdge.classList.toggle("disabled",end);
- if(!start&&!end&&!coverAnimating)gutter.classList.add("show");else gutter.classList.remove("show");
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+
+/* -------------------------------------------------------
+   CONFIGURATION
+------------------------------------------------------- */
+
+const PDF_FILE =
+  "Annual%20report%2025-26_V2.pdf";
+
+const COVER_PAGE = 1;
+
+const FIRST_INTERIOR = 2;
+
+
+/* -------------------------------------------------------
+   ELEMENTS
+------------------------------------------------------- */
+
+const stage =
+  document.getElementById("stage");
+
+const flipbook =
+  document.getElementById("flipbook");
+
+const frontCover =
+  document.getElementById("frontCover");
+
+const coverImage =
+  document.getElementById("coverImage");
+
+const gutter =
+  document.getElementById("gutter");
+
+const loading =
+  document.getElementById("loading");
+
+const loadingText =
+  document.getElementById("loadingText");
+
+const errorBox =
+  document.getElementById("error");
+
+const errorText =
+  document.getElementById("errorText");
+
+const info =
+  document.getElementById("info");
+
+const prev =
+  document.getElementById("prev");
+
+const next =
+  document.getElementById("next");
+
+const prevEdge =
+  document.getElementById("prevEdge");
+
+const nextEdge =
+  document.getElementById("nextEdge");
+
+const zoomIn =
+  document.getElementById("zoomIn");
+
+const zoomOut =
+  document.getElementById("zoomOut");
+
+const zoomLabel =
+  document.getElementById("zoomLabel");
+
+const full =
+  document.getElementById("full");
+
+
+/* -------------------------------------------------------
+   STATE
+------------------------------------------------------- */
+
+let pdf = null;
+
+let flip = null;
+
+let totalPages = 0;
+
+let zoom = 1;
+
+let coverOpened = false;
+
+let interiorPageCount = 0;
+
+
+/* -------------------------------------------------------
+   HELPERS
+------------------------------------------------------- */
+
+function setLoading(text){
+
+  loadingText.textContent = text;
+
 }
-function beginCoverForward(){
- if(coverAnimating||current!==0)return;
- coverAnimating=true;gutter.classList.remove("show");
- coverSheet.classList.remove("turnBack");void coverSheet.offsetWidth;coverSheet.classList.add("turnForward");
- setTimeout(()=>{coverStage.classList.add("hidden");coverSheet.classList.remove("turnForward");flip.turnToPage(0);updateNav(1);gutter.classList.add("show");coverAnimating=false},790);
+
+
+function showError(message){
+
+  loading.style.display = "none";
+
+  errorText.textContent = message;
+
+  errorBox.style.display = "flex";
+
 }
-function beginCoverBack(){
- if(coverAnimating||current!==1)return;
- coverAnimating=true;gutter.classList.remove("show");
- coverStage.classList.remove("hidden");coverSheet.classList.remove("turnForward");void coverSheet.offsetWidth;coverSheet.classList.add("turnBack");
- setTimeout(()=>{coverSheet.classList.remove("turnBack");flip.turnToPage(0);updateNav(0);coverAnimating=false},790);
+
+
+/* -------------------------------------------------------
+   CREATE PAGE
+------------------------------------------------------- */
+
+function makePage(dataUrl,pdfPageNumber){
+
+  const div =
+    document.createElement("div");
+
+  div.className = "page";
+
+  const img =
+    document.createElement("img");
+
+  img.src = dataUrl;
+
+  img.alt =
+    "Annual Report page " +
+    pdfPageNumber;
+
+  div.appendChild(img);
+
+  flipbook.appendChild(div);
+
 }
-function goNext(){if(coverAnimating)return;if(current===0){beginCoverForward();return}if(current===total-1)return;flip.flipNext("bottom")}
-function goPrev(){if(coverAnimating)return;if(current===1){beginCoverBack();return}if(current<=0)return;if(current===total-1){flip.flipPrev("bottom");return}flip.flipPrev("bottom")}
-prev.onclick=goPrev;prevEdge.onclick=goPrev;next.onclick=goNext;nextEdge.onclick=goNext;
-function setZoom(){book.style.transform="scale("+zoom+")";gutter.style.transform="translateX(-50%) scaleY("+zoom+")";zoomLabel.textContent=Math.round(zoom*100)+"%"}
-zoomIn.onclick=()=>{zoom=Math.min(1.5,zoom+.1);setZoom()};zoomOut.onclick=()=>{zoom=Math.max(.8,zoom-.1);setZoom()};zoomLabel.onclick=()=>{zoom=1;setZoom()};
-full.onclick=async()=>{if(!document.fullscreenElement)await document.documentElement.requestFullscreen?.();else await document.exitFullscreen?.()};
-document.addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key==="PageDown")goNext();if(e.key==="ArrowLeft"||e.key==="PageUp")goPrev();if(e.key==="+")zoomIn.click();if(e.key==="-")zoomOut.click();if(e.key==="0")zoomLabel.click()});
+
+
+/* -------------------------------------------------------
+   PDF RENDERING
+------------------------------------------------------- */
+
+async function renderPage(
+  pageNumber,
+  scale
+){
+
+  const page =
+    await pdf.getPage(pageNumber);
+
+  const viewport =
+    page.getViewport({
+      scale:scale
+    });
+
+  const canvas =
+    document.createElement("canvas");
+
+  const ctx =
+    canvas.getContext(
+      "2d",
+      {
+        alpha:false
+      }
+    );
+
+  canvas.width =
+    Math.ceil(viewport.width);
+
+  canvas.height =
+    Math.ceil(viewport.height);
+
+  await page.render({
+
+    canvasContext:ctx,
+
+    viewport:viewport
+
+  }).promise;
+
+  return canvas.toDataURL(
+    "image/jpeg",
+    .90
+  );
+
+}
+
+
+/* -------------------------------------------------------
+   CENTER GEOMETRY
+
+   The center of the two-page spread and the hinge of the
+   front cover use EXACTLY the same coordinate.
+------------------------------------------------------- */
+
+function setCenterGeometry(
+  pageWidth,
+  pageHeight
+){
+
+  const maxBookW =
+    Math.min(
+      window.innerWidth * .94,
+      1240
+    );
+
+  const maxBookH =
+    Math.min(
+      window.innerHeight * .86,
+      900
+    );
+
+  const aspect =
+    pageWidth / pageHeight;
+
+  let h =
+    maxBookH;
+
+  let w =
+    h * aspect * 2;
+
+  if(w > maxBookW){
+
+    w =
+      maxBookW;
+
+    h =
+      w / (aspect * 2);
+
+  }
+
+  stage.style.width =
+    w + "px";
+
+  stage.style.height =
+    h + "px";
+
+  frontCover.style.width =
+    (w / 2) + "px";
+
+  frontCover.style.height =
+    h + "px";
+
+  gutter.style.height =
+    h + "px";
+
+}
+
+
+/* -------------------------------------------------------
+   NAVIGATION DISPLAY
+------------------------------------------------------- */
+
+function updateNavigation(index){
+
+  if(!coverOpened){
+
+    info.textContent =
+      "Cover";
+
+    prev.disabled =
+      true;
+
+    prevEdge.classList.add(
+      "disabled"
+    );
+
+    next.disabled =
+      false;
+
+    nextEdge.classList.remove(
+      "disabled"
+    );
+
+    gutter.classList.remove(
+      "visible"
+    );
+
+    return;
+
+  }
+
+
+  const firstPdfPage =
+    FIRST_INTERIOR + index;
+
+
+  if(
+    firstPdfPage >=
+    totalPages
+  ){
+
+    info.textContent =
+      "Back cover";
+
+  }
+  else{
+
+    const secondPdfPage =
+      Math.min(
+        firstPdfPage + 1,
+        totalPages
+      );
+
+    info.textContent =
+      firstPdfPage +
+      "–" +
+      secondPdfPage +
+      " / " +
+      totalPages;
+
+  }
+
+
+  const atStart =
+    index <= 0;
+
+  const atEnd =
+    index >=
+    interiorPageCount - 1;
+
+
+  prev.disabled =
+    atStart;
+
+  prevEdge.classList.toggle(
+    "disabled",
+    atStart
+  );
+
+
+  next.disabled =
+    atEnd;
+
+  nextEdge.classList.toggle(
+    "disabled",
+    atEnd
+  );
+
+
+  if(
+    !atStart &&
+    !atEnd
+  ){
+
+    gutter.classList.add(
+      "visible"
+    );
+
+  }
+  else{
+
+    gutter.classList.remove(
+      "visible"
+    );
+
+  }
+
+}
+
+
+/* -------------------------------------------------------
+   OPEN FRONT COVER
+
+   The interior spread is already underneath the cover.
+   The cover therefore never exposes a white placeholder.
+------------------------------------------------------- */
+
+function openCover(){
+
+  if(coverOpened)
+    return;
+
+  coverOpened =
+    true;
+
+
+  gutter.classList.add(
+    "turning"
+  );
+
+
+  frontCover.classList.remove(
+    "opened"
+  );
+
+
+  frontCover.classList.add(
+    "opening"
+  );
+
+
+  /*
+    Reveal the already-rendered spread shortly after the
+    physical cover begins turning.
+  */
+
+  setTimeout(function(){
+
+    flipbook.classList.add(
+      "visible"
+    );
+
+  },170);
+
+
+  /*
+    The 820ms cover movement and the 780ms interior turn
+    are deliberately very close, so the opening does not
+    feel like a different animation system.
+  */
+
+  setTimeout(function(){
+
+    frontCover.classList.add(
+      "opened"
+    );
+
+    gutter.classList.remove(
+      "turning"
+    );
+
+    updateNavigation(0);
+
+  },840);
+
+}
+
+
+/* -------------------------------------------------------
+   CLOSE FRONT COVER
+------------------------------------------------------- */
+
+function closeCover(){
+
+  if(!coverOpened)
+    return;
+
+
+  gutter.classList.add(
+    "turning"
+  );
+
+
+  flipbook.classList.remove(
+    "visible"
+  );
+
+
+  frontCover.classList.remove(
+    "opened"
+  );
+
+
+  /*
+    Force a layout read so the browser cannot skip the
+    closed state before the reverse animation.
+  */
+
+  void frontCover.offsetWidth;
+
+
+  frontCover.classList.remove(
+    "opening"
+  );
+
+
+  setTimeout(function(){
+
+    coverOpened =
+      false;
+
+    gutter.classList.remove(
+      "turning"
+    );
+
+    updateNavigation(0);
+
+  },840);
+
+}
+
+
+/* -------------------------------------------------------
+   NEXT / PREVIOUS
+------------------------------------------------------- */
+
+function goNext(){
+
+  if(!coverOpened){
+
+    openCover();
+
+    return;
+
+  }
+
+  if(flip){
+
+    flip.flipNext(
+      "bottom"
+    );
+
+  }
+
+}
+
+
+function goPrev(){
+
+  if(!coverOpened)
+    return;
+
+
+  if(
+    flip &&
+    flip.getCurrentPageIndex() > 0
+  ){
+
+    flip.flipPrev(
+      "bottom"
+    );
+
+    return;
+
+  }
+
+
+  closeCover();
+
+}
+
+
+/* -------------------------------------------------------
+   BUTTON EVENTS
+------------------------------------------------------- */
+
+prev.onclick =
+  goPrev;
+
+prevEdge.onclick =
+  goPrev;
+
+next.onclick =
+  goNext;
+
+nextEdge.onclick =
+  goNext;
+
+
+/* -------------------------------------------------------
+   ZOOM
+------------------------------------------------------- */
+
+function setZoom(){
+
+  stage.style.transform =
+    "scale(" +
+    zoom +
+    ")";
+
+  zoomLabel.textContent =
+    Math.round(
+      zoom * 100
+    ) +
+    "%";
+
+}
+
+
+zoomIn.onclick =
+  function(){
+
+    zoom =
+      Math.min(
+        1.5,
+        zoom + .1
+      );
+
+    setZoom();
+
+  };
+
+
+zoomOut.onclick =
+  function(){
+
+    zoom =
+      Math.max(
+        .8,
+        zoom - .1
+      );
+
+    setZoom();
+
+  };
+
+
+zoomLabel.onclick =
+  function(){
+
+    zoom =
+      1;
+
+    setZoom();
+
+  };
+
+
+/* -------------------------------------------------------
+   FULLSCREEN
+------------------------------------------------------- */
+
+full.onclick =
+  async function(){
+
+    if(
+      !document.fullscreenElement
+    ){
+
+      await document
+        .documentElement
+        .requestFullscreen?.();
+
+    }
+    else{
+
+      await document
+        .exitFullscreen?.();
+
+    }
+
+  };
+
+
+/* -------------------------------------------------------
+   KEYBOARD
+------------------------------------------------------- */
+
+document.addEventListener(
+  "keydown",
+  function(e){
+
+    if(
+      e.key === "ArrowRight" ||
+      e.key === "PageDown"
+    ){
+
+      e.preventDefault();
+
+      goNext();
+
+    }
+
+
+    if(
+      e.key === "ArrowLeft" ||
+      e.key === "PageUp"
+    ){
+
+      e.preventDefault();
+
+      goPrev();
+
+    }
+
+
+    if(e.key === "+")
+      zoomIn.click();
+
+    if(e.key === "-")
+      zoomOut.click();
+
+    if(e.key === "0")
+      zoomLabel.click();
+
+  }
+);
+
+
+/* -------------------------------------------------------
+   WINDOW RESIZE
+------------------------------------------------------- */
+
+window.addEventListener(
+  "resize",
+  function(){
+
+    if(
+      !pdf ||
+      !flip
+    )
+      return;
+
+    setZoom();
+
+  }
+);
+
+
+/* -------------------------------------------------------
+   START
+------------------------------------------------------- */
 
 async function start(){
- try{
-  setLoading("Loading PDF…");const r=await fetch(PDF_FILE,{cache:"no-store"});if(!r.ok)throw new Error("PDF request returned HTTP "+r.status);
-  pdf=await pdfjsLib.getDocument({data:await r.arrayBuffer()}).promise;total=pdf.numPages;
-  for(let n=1;n<=total;n++){setLoading("Preparing page "+n+" of "+total+"…");images.push(await renderPage(n))}
-  coverImg.src=images[0];
-  // Interior engine uses pages 2..82 only. This removes the problematic showCover
-  // state machine that was repeatedly snapping back to the cover.
-  makePage("", -1);
-  for(let i=1;i<total;i++)makePage(images[i],i);
-  const size=(await pdf.getPage(1)).getViewport({scale:1});
-  flip=new St.PageFlip(book,{width:size.width,height:size.height,size:"stretch",minWidth:280,maxWidth:1000,minHeight:396,maxHeight:1350,drawShadow:true,maxShadowOpacity:.46,flippingTime:780,usePortrait:true,showCover:false,autoSize:true,mobileScrollSupport:false,swipeDistance:30,useMouseEvents:true,disableFlipByClick:false,startPage:0});
-  flip.loadFromHTML(book.querySelectorAll(".page"));
-  flip.on("flip",e=>{const interior=e.data;updateNav(Math.min(total-1, Math.max(1, interior+1)))});
-  flip.on("changeOrientation",()=>{if(!coverAnimating)updateNav(Math.min(total-1, Math.max(1, flip.getCurrentPageIndex()+1)))});
-  updateNav(0);
-  loading.style.opacity="0";setTimeout(()=>loading.style.display="none",350)
- }catch(e){console.error(e);showError("The viewer could not load the PDF. "+(e.message||"Unknown error."))}
+
+  try{
+
+    setLoading(
+      "Loading PDF…"
+    );
+
+
+    /*
+      Fetch explicitly so the filename containing spaces is
+      handled reliably on GitHub Pages.
+    */
+
+    const response =
+      await fetch(
+        PDF_FILE,
+        {
+          cache:"no-store"
+        }
+      );
+
+
+    if(!response.ok){
+
+      throw new Error(
+        "PDF request returned HTTP " +
+        response.status
+      );
+
+    }
+
+
+    const buffer =
+      await response.arrayBuffer();
+
+
+    setLoading(
+      "Reading annual report…"
+    );
+
+
+    pdf =
+      await pdfjsLib
+        .getDocument({
+          data:buffer
+        })
+        .promise;
+
+
+    totalPages =
+      pdf.numPages;
+
+
+    if(totalPages < 3){
+
+      throw new Error(
+        "The PDF does not contain enough pages for a magazine."
+      );
+
+    }
+
+
+    /*
+      Get the original PDF dimensions.
+    */
+
+    const firstPage =
+      await pdf.getPage(
+        COVER_PAGE
+      );
+
+    const baseViewport =
+      firstPage.getViewport({
+        scale:1
+      });
+
+
+    /*
+      IMPORTANT:
+      Establish the final centered spread geometry BEFORE
+      showing anything.
+    */
+
+    setCenterGeometry(
+      baseViewport.width,
+      baseViewport.height
+    );
+
+
+    /*
+      Render the front cover separately.
+    */
+
+    setLoading(
+      "Preparing cover…"
+    );
+
+
+    coverImage.src =
+      await renderPage(
+        COVER_PAGE,
+        1.35
+      );
+
+
+    /*
+      IMPORTANT:
+      Page 1 is NEVER loaded into StPageFlip.
+
+      The interior engine begins at PDF page 2.
+
+      Therefore normal page navigation can never jump
+      back to the front cover.
+    */
+
+    for(
+      let pdfPage = FIRST_INTERIOR;
+      pdfPage <= totalPages;
+      pdfPage++
+    ){
+
+      setLoading(
+        "Preparing page " +
+        pdfPage +
+        " of " +
+        totalPages +
+        "…"
+      );
+
+
+      makePage(
+        await renderPage(
+          pdfPage,
+          1.25
+        ),
+        pdfPage
+      );
+
+    }
+
+
+    interiorPageCount =
+      totalPages -
+      FIRST_INTERIOR +
+      1;
+
+
+    if(
+      !window.St ||
+      !window.St.PageFlip
+    ){
+
+      throw new Error(
+        "The page-flip library did not load."
+      );
+
+    }
+
+
+    /*
+      Interior page-flip engine.
+
+      showCover is FALSE intentionally.
+
+      The front cover is handled by the dedicated
+      physical cover above, eliminating the cover/spread
+      coordinate jump.
+    */
+
+    flip =
+      new St.PageFlip(
+        flipbook,
+        {
+
+          width:
+            baseViewport.width,
+
+          height:
+            baseViewport.height,
+
+          size:
+            "stretch",
+
+          minWidth:
+            280,
+
+          maxWidth:
+            1000,
+
+          minHeight:
+            396,
+
+          maxHeight:
+            1350,
+
+          drawShadow:
+            true,
+
+          maxShadowOpacity:
+            .42,
+
+          flippingTime:
+            780,
+
+          usePortrait:
+            true,
+
+          showCover:
+            false,
+
+          autoSize:
+            true,
+
+          mobileScrollSupport:
+            false,
+
+          swipeDistance:
+            30,
+
+          useMouseEvents:
+            true,
+
+          disableFlipByClick:
+            false,
+
+          startPage:
+            0
+
+        }
+      );
+
+
+    flip.loadFromHTML(
+      flipbook.querySelectorAll(
+        ".page"
+      )
+    );
+
+
+    flip.on(
+      "flip",
+      function(e){
+
+        updateNavigation(
+          e.data
+        );
+
+      }
+    );
+
+
+    flip.on(
+      "changeOrientation",
+      function(){
+
+        updateNavigation(
+          flip.getCurrentPageIndex()
+        );
+
+      }
+    );
+
+
+    flip.on(
+      "changeState",
+      function(e){
+
+        if(
+          e.data === "flipping"
+        ){
+
+          gutter.classList.add(
+            "turning"
+          );
+
+        }
+
+
+        if(
+          e.data === "read"
+        ){
+
+          updateNavigation(
+            flip.getCurrentPageIndex()
+          );
+
+        }
+
+      }
+    );
+
+
+    /*
+      The interior is fully ready before the cover is
+      allowed to move.
+    */
+
+    flipbook.classList.add(
+      "ready"
+    );
+
+
+    updateNavigation(0);
+
+
+    loading.style.opacity =
+      "0";
+
+
+    setTimeout(
+      function(){
+
+        loading.style.display =
+          "none";
+
+      },
+      350
+    );
+
+
+  }
+  catch(err){
+
+    console.error(err);
+
+    showError(
+      "The viewer could not load the PDF. " +
+      (
+        err &&
+        err.message
+          ? err.message
+          : "Unknown error."
+      )
+    );
+
+  }
+
 }
+
+
 start();
+
 </script>
+
 </body>
 </html>
