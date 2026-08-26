@@ -51,18 +51,21 @@ body{
   width:38px;
   transform:translateX(-50%);
   pointer-events:none;
-  z-index:20;
+
+  /*
+    IMPORTANT:
+    The gutter is BELOW the page surfaces, not above them.
+    Therefore the turning page naturally covers it as it
+    crosses the spine. There is no hide/show animation.
+  */
+  z-index:0;
+
   background:linear-gradient(90deg,
-    transparent,
+    transparent 0%,
     rgba(0,0,0,.035) 20%,
     rgba(0,0,0,.16) 50%,
     rgba(0,0,0,.035) 80%,
-    transparent);
-}
-
-/* The gutter must NEVER sit on top of the page that is turning. */
-#book.flipping:after{
-  opacity:0 !important;
+    transparent 100%);
 }
 .nav{
   position:fixed;top:50%;
@@ -383,35 +386,12 @@ body{
       flip.loadFromHTML(pages);
 
       /*
-        Keep the center gutter hidden while the physical page is
-        rotating. It returns only after the turn is complete.
+        The gutter is static. It is painted UNDER the pages, so
+        there is no visual disappearing/reappearing during a turn.
+        The physical turning page covers it naturally.
       */
-      let gutterTimer = null;
-
-      function hideGutterDuringTurn(){
-        book.classList.add("flipping");
-        clearTimeout(gutterTimer);
-      }
-
-      function restoreGutterAfterTurn(){
-        clearTimeout(gutterTimer);
-        gutterTimer = setTimeout(function(){
-          book.classList.remove("flipping");
-        }, 80);
-      }
-
       flip.on("flip",function(e){
-        hideGutterDuringTurn();
         update(e.data);
-        restoreGutterAfterTurn();
-      });
-
-      flip.on("changeState",function(e){
-        if(e && e.data === "flipping"){
-          hideGutterDuringTurn();
-        }else{
-          restoreGutterAfterTurn();
-        }
       });
 
       flip.on("changeOrientation",function(){
