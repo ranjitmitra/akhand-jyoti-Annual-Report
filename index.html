@@ -1,1133 +1,406 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Akhand Jyoti — Annual Report 2025–26</title>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
+
 <style>
-:root{
-  --bg1:#3a3a3a;
-  --bg2:#181818;
-  --ui:rgba(22,22,22,.88);
-  --white:#fff;
-}
-
 *{box-sizing:border-box}
-
-html,body{
-  margin:0;
-  width:100%;
-  height:100%;
-  overflow:hidden;
-}
-
+html,body{margin:0;width:100%;height:100%;overflow:hidden}
 body{
-  background:
-    radial-gradient(
-      ellipse at center 42%,
-      #454545 0%,
-      #2a2a2a 34%,
-      #151515 76%,
-      #0d0d0d 100%
-    );
-  color:var(--white);
+  background:#f3f3f3;
   font-family:Arial,Helvetica,sans-serif;
 }
-
 #reader{
-  position:relative;
-  width:100%;
-  height:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  position:fixed;inset:0;
+  display:flex;align-items:center;justify-content:center;
   overflow:hidden;
 }
-
 #bookWrap{
   position:relative;
-  width:min(94vw,1240px);
+  width:min(88vw,1280px);
   height:min(86vh,900px);
   display:flex;
   align-items:center;
   justify-content:center;
 }
-
 #book{
   position:relative;
   margin:auto;
-  box-shadow:0 24px 55px rgba(0,0,0,.5);
 }
-
-/* Middle gutter shadow */
-#book.spread::after{
-  content:"";
-  position:absolute;
-  left:50%;
-  top:0;
-  bottom:0;
-  width:34px;
-  transform:translateX(-50%);
-  pointer-events:none;
-  z-index:50;
-  background:
-    linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(0,0,0,.035) 18%,
-      rgba(0,0,0,.12) 50%,
-      rgba(0,0,0,.035) 82%,
-      transparent 100%
-    );
-  opacity:0;
-  transition:opacity .2s ease;
-}
-
-#book.spread::after{
-  opacity:1;
-}
-
 .page{
   background:#fff;
   overflow:hidden;
-  box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);
 }
-
 .page img{
+  display:block;
   width:100%;
   height:100%;
-  display:block;
   object-fit:contain;
-  background:#fff;
   user-select:none;
   -webkit-user-drag:none;
 }
-
-.page-cover{
-  box-shadow:0 10px 30px rgba(0,0,0,.22);
+#book.spread:after{
+  content:"";
+  position:absolute;
+  top:0;bottom:0;left:50%;
+  width:38px;
+  transform:translateX(-50%);
+  pointer-events:none;
+  z-index:20;
+  background:linear-gradient(90deg,
+    transparent,
+    rgba(0,0,0,.035) 20%,
+    rgba(0,0,0,.16) 50%,
+    rgba(0,0,0,.035) 80%,
+    transparent);
 }
-
-/* Loading */
-#loader{
-  position:fixed;
-  inset:0;
+.nav{
+  position:fixed;top:50%;
+  transform:translateY(-50%);
   z-index:1000;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#171717;
-  transition:opacity .3s;
+  width:60px;height:112px;
+  border:0;border-radius:12px;
+  background:rgba(35,35,35,.82);
+  color:#fff;
+  font-size:56px;font-weight:200;
+  cursor:pointer;
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
 }
-
-.loader-inner{
-  text-align:center;
-  color:#ddd;
-  font-size:13px;
+.nav:hover{background:rgba(20,20,20,.95)}
+.nav:disabled{opacity:.2;pointer-events:none}
+#prevEdge{left:18px}
+#nextEdge{right:18px}
+#controls{
+  position:fixed;left:50%;bottom:14px;
+  transform:translateX(-50%);
+  z-index:1100;
+  display:flex;align-items:center;gap:5px;
+  padding:7px 8px;
+  background:rgba(35,35,35,.92);
+  border-radius:9px;
 }
-
-.spinner{
-  width:34px;
-  height:34px;
-  margin:0 auto 13px;
+.ctrl{
+  width:38px;height:34px;
+  border:0;border-radius:6px;
+  background:#3b3b3b;color:#fff;
+  cursor:pointer;
+}
+.ctrl:hover{background:#505050}
+#info{
+  min-width:100px;text-align:center;
+  color:#ddd;font-size:12px;
+}
+#zoomReset{width:48px;font-size:11px}
+#loading{
+  position:fixed;inset:0;z-index:5000;
+  display:flex;align-items:center;justify-content:center;
+  background:#f3f3f3;color:#555;
+}
+.loader{text-align:center;font-size:13px}
+.spin{
+  width:34px;height:34px;
+  margin:0 auto 12px;
+  border:3px solid #ddd;
+  border-top-color:#555;
   border-radius:50%;
-  border:3px solid rgba(255,255,255,.18);
-  border-top-color:#fff;
   animation:spin .8s linear infinite;
 }
-
-@keyframes spin{
-  to{transform:rotate(360deg)}
+@keyframes spin{to{transform:rotate(360deg)}}
+#error{
+  position:fixed;inset:0;z-index:6000;
+  display:none;align-items:center;justify-content:center;
+  background:#f3f3f3;color:#333;text-align:center;
+  padding:30px;
 }
-
-#title{
-  position:fixed;
-  z-index:500;
-  top:12px;
-  left:50%;
-  transform:translateX(-50%);
-  font-size:13px;
-  font-weight:600;
-  color:rgba(255,255,255,.78);
-  pointer-events:none;
-  white-space:nowrap;
-}
-
-/* Prominent navigation */
-.edgeNav{
-  position:fixed;
-  z-index:700;
-  top:50%;
-  transform:translateY(-50%);
-  width:58px;
-  height:116px;
-  border:0;
-  border-radius:14px;
-  background:rgba(18,18,18,.72);
-  color:#fff;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  box-shadow:0 7px 22px rgba(0,0,0,.32);
-  backdrop-filter:blur(8px);
-  transition:
-    background .2s,
-    opacity .2s,
-    transform .2s;
-}
-
-.edgeNav:hover{
-  background:rgba(40,40,40,.94);
-}
-
-.edgeNav:active{
-  transform:translateY(-50%) scale(.96);
-}
-
-.edgeNav span{
-  font-size:54px;
-  font-weight:200;
-  line-height:1;
-  margin-top:-4px;
-}
-
-#prevEdge{
-  left:18px;
-}
-
-#nextEdge{
-  right:18px;
-}
-
-.edgeNav.disabled{
-  opacity:.18;
-  pointer-events:none;
-}
-
-/* Bottom controls */
-#controls{
-  position:fixed;
-  z-index:800;
-  left:50%;
-  bottom:14px;
-  transform:translateX(-50%);
-  display:flex;
-  align-items:center;
-  gap:6px;
-  padding:7px 9px;
-  border-radius:12px;
-  background:var(--ui);
-  border:1px solid rgba(255,255,255,.13);
-  box-shadow:0 9px 28px rgba(0,0,0,.42);
-  backdrop-filter:blur(12px);
-}
-
-.control{
-  width:38px;
-  height:35px;
-  border:1px solid rgba(255,255,255,.12);
-  border-radius:7px;
-  background:#303030;
-  color:#fff;
-  cursor:pointer;
-  font-size:16px;
-}
-
-.control:hover{
-  background:#414141;
-}
-
-#pageInfo{
-  min-width:95px;
-  text-align:center;
-  font-size:12px;
-  color:#ddd;
-  font-variant-numeric:tabular-nums;
-}
-
-#zoomLabel{
-  width:48px;
-  font-size:11px;
-}
-
-#hint{
-  position:fixed;
-  z-index:500;
-  right:16px;
-  bottom:20px;
-  font-size:11px;
-  color:rgba(255,255,255,.38);
-}
-
-@media(max-width:850px){
-
-  #bookWrap{
-    width:100vw;
-    height:82vh;
-  }
-
-  .edgeNav{
-    width:46px;
-    height:92px;
-    border-radius:10px;
-  }
-
-  .edgeNav span{
-    font-size:42px;
-  }
-
-  #prevEdge{
-    left:6px;
-  }
-
-  #nextEdge{
-    right:6px;
-  }
-
-  #title{
-    font-size:11px;
-    max-width:88%;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
-
-  #hint{
-    display:none;
-  }
-}
-
-@media(max-width:520px){
-
-  #controls{
-    bottom:7px;
-  }
-
-  .control{
-    width:34px;
-    height:33px;
-  }
-
-  #pageInfo{
-    min-width:74px;
-  }
+#error strong{display:block;font-size:20px;margin-bottom:8px}
+@media(max-width:800px){
+  #bookWrap{width:94vw;height:80vh}
+  .nav{width:46px;height:86px;font-size:43px}
+  #prevEdge{left:5px}#nextEdge{right:5px}
 }
 </style>
 </head>
 
 <body>
+<div id="reader"><div id="book"></div></div>
 
-<div id="reader">
-
-  <div id="bookWrap">
-
-    <div id="book"></div>
-
-  </div>
-
-</div>
-
-<div id="title">
-  Akhand Jyoti — Annual Report 2025–26
-</div>
-
-
-<!-- Previous -->
-
-<button
-  id="prevEdge"
-  class="edgeNav disabled"
-  aria-label="Previous page"
-  title="Previous page"
->
-  <span>‹</span>
-</button>
-
-
-<!-- Next -->
-
-<button
-  id="nextEdge"
-  class="edgeNav"
-  aria-label="Next page"
-  title="Next page"
->
-  <span>›</span>
-</button>
-
-
-<!-- Controls -->
+<button id="prevEdge" class="nav" disabled aria-label="Previous">‹</button>
+<button id="nextEdge" class="nav" aria-label="Next">›</button>
 
 <div id="controls">
+  <button id="prev" class="ctrl">‹</button>
+  <div id="info">Cover</div>
+  <button id="next" class="ctrl">›</button>
+  <button id="zoomOut" class="ctrl">−</button>
+  <button id="zoomReset" class="ctrl">100%</button>
+  <button id="zoomIn" class="ctrl">+</button>
+  <button id="full" class="ctrl">⛶</button>
+</div>
 
-  <button
-    class="control"
-    id="prev"
-    title="Previous page"
-  >
-    ‹
-  </button>
-
-  <div id="pageInfo">
-    Cover
+<div id="loading">
+  <div class="loader">
+    <div class="spin"></div>
+    <div id="loadText">Opening annual report…</div>
   </div>
-
-  <button
-    class="control"
-    id="next"
-    title="Next page"
-  >
-    ›
-  </button>
-
-  <button
-    class="control"
-    id="zoomOut"
-    title="Zoom out"
-  >
-    −
-  </button>
-
-  <button
-    class="control"
-    id="zoomLabel"
-    title="Reset zoom"
-  >
-    100%
-  </button>
-
-  <button
-    class="control"
-    id="zoomIn"
-    title="Zoom in"
-  >
-    +
-  </button>
-
-  <button
-    class="control"
-    id="full"
-    title="Fullscreen"
-  >
-    ⛶
-  </button>
-
 </div>
 
-
-<div id="hint">
-  Drag a page corner or use the arrows
-</div>
-
-
-<!-- Loading -->
-
-<div id="loader">
-
-  <div class="loader-inner">
-
-    <div class="spinner"></div>
-
-    <div id="loadText">
-      Preparing your annual report…
-    </div>
-
+<div id="error">
+  <div>
+    <strong>Unable to open the annual report</strong>
+    <div id="errorText"></div>
   </div>
-
 </div>
 
-
-<!-- Page Flip library -->
-<script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
-
-
-<script type="module">
-
-/* =========================================================
-   PDF.JS
-========================================================= */
-
-const pdfjsLib =
-  await import(
-    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs"
-  );
-
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs";
-
-
-/* =========================================================
-   YOUR PDF
-========================================================= */
-
-const PDF_FILE =
-  "Annual report 25-26_V2.pdf";
-
-
-/* =========================================================
-   ELEMENTS
-========================================================= */
-
-const book =
-  document.getElementById("book");
-
-const wrap =
-  document.getElementById("bookWrap");
-
-const loader =
-  document.getElementById("loader");
-
-const loadText =
-  document.getElementById("loadText");
-
-const info =
-  document.getElementById("pageInfo");
-
-const prev =
-  document.getElementById("prev");
-
-const next =
-  document.getElementById("next");
-
-const prevEdge =
-  document.getElementById("prevEdge");
-
-const nextEdge =
-  document.getElementById("nextEdge");
-
-const zoomIn =
-  document.getElementById("zoomIn");
-
-const zoomOut =
-  document.getElementById("zoomOut");
-
-const zoomLabel =
-  document.getElementById("zoomLabel");
-
-const full =
-  document.getElementById("full");
-
-
-/* =========================================================
-   VARIABLES
-========================================================= */
-
-let pdf = null;
-
-let pageFlip = null;
-
-let images = [];
-
-let zoom = 1;
-
-let total = 82;
-
-
-/* =========================================================
-   LOADING TEXT
-========================================================= */
-
-function setLoad(text){
-
-  loadText.textContent =
-    text;
-
-}
-
-
-/* =========================================================
-   RENDER PDF PAGE
-========================================================= */
-
-function render(n){
-
-  return pdf
-    .getPage(n)
-    .then(page => {
-
-      const scale = 1.25;
-
-      const viewport =
-        page.getViewport({
-          scale
-        });
-
-      const canvas =
-        document.createElement(
-          "canvas"
-        );
-
-      const ctx =
-        canvas.getContext(
-          "2d",
-          {
-            alpha:false
-          }
-        );
-
-      canvas.width =
-        Math.ceil(
-          viewport.width
-        );
-
-      canvas.height =
-        Math.ceil(
-          viewport.height
-        );
-
-      return page
-        .render({
-          canvasContext:ctx,
-          viewport
-        })
-        .promise
-        .then(() => {
-
-          return canvas.toDataURL(
-            "image/jpeg",
-            .9
-          );
-
-        });
-
-    });
-
-}
-
-
-/* =========================================================
-   CREATE PAGE
-========================================================= */
-
-function createPage(src,index){
-
-  const page =
-    document.createElement(
-      "div"
-    );
-
-  page.className =
-    "page";
-
-  const img =
-    document.createElement(
-      "img"
-    );
-
-  img.src =
-    src;
-
-  img.alt =
-    "Annual Report page "
-    + (index + 1);
-
-  page.appendChild(img);
-
-  book.appendChild(page);
-
-}
-
-
-/* =========================================================
-   UPDATE UI
-========================================================= */
-
-function update(index){
-
-  if(index === 0){
-
-    info.textContent =
-      "Cover";
-
+<script>
+(function(){
+
+  const PDF_FILE = "./Annual%20report%2025-26_V2.pdf";
+
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+  const book = document.getElementById("book");
+  const loading = document.getElementById("loading");
+  const loadText = document.getElementById("loadText");
+  const errorBox = document.getElementById("error");
+  const errorText = document.getElementById("errorText");
+  const info = document.getElementById("info");
+
+  const prev = document.getElementById("prev");
+  const next = document.getElementById("next");
+  const prevEdge = document.getElementById("prevEdge");
+  const nextEdge = document.getElementById("nextEdge");
+
+  let flip = null;
+  let total = 0;
+  let zoom = 1;
+
+  function fail(message){
+    console.error(message);
+    loading.style.display = "none";
+    errorText.textContent = message;
+    errorBox.style.display = "flex";
   }
 
-  else if(index === total - 1){
-
-    info.textContent =
-      "Back cover";
-
+  function renderPage(pageNumber){
+    return pdfjsLib.getDocument(PDF_FILE).promise;
   }
 
-  else{
+  async function pageImage(pdfDoc, n){
+    const page = await pdfDoc.getPage(n);
+    const base = page.getViewport({scale:1});
+    const targetWidth = 900;
+    const scale = targetWidth / base.width;
+    const viewport = page.getViewport({scale:scale});
 
-    const first =
-      index + 1;
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.ceil(viewport.width);
+    canvas.height = Math.ceil(viewport.height);
 
-    const second =
-      Math.min(
-        index + 2,
-        total - 1
-      );
+    const ctx = canvas.getContext("2d", {alpha:false});
+    await page.render({
+      canvasContext:ctx,
+      viewport:viewport
+    }).promise;
 
-    info.textContent =
-      `${first}–${second} / ${total}`;
-
+    return {
+      src:canvas.toDataURL("image/jpeg",.94),
+      width:base.width,
+      height:base.height
+    };
   }
 
+  function addPage(src, index){
+    const el = document.createElement("div");
+    el.className = "page";
+    el.dataset.page = index + 1;
 
-  book.classList.toggle(
-    "spread",
-    index > 0 &&
-    index < total - 1
-  );
+    const img = document.createElement("img");
+    img.src = src;
+    img.alt = "Annual Report page " + (index + 1);
+    img.draggable = false;
 
-
-  const atStart =
-    index === 0;
-
-  const atEnd =
-    index === total - 1;
-
-
-  prev.disabled =
-    atStart;
-
-  prevEdge.classList.toggle(
-    "disabled",
-    atStart
-  );
-
-
-  next.disabled =
-    atEnd;
-
-  nextEdge.classList.toggle(
-    "disabled",
-    atEnd
-  );
-
-}
-
-
-/* =========================================================
-   ZOOM
-========================================================= */
-
-function applyZoom(){
-
-  book.style.transform =
-    `scale(${zoom})`;
-
-  zoomLabel.textContent =
-    Math.round(
-      zoom * 100
-    ) + "%";
-
-}
-
-
-/* =========================================================
-   NAVIGATION
-========================================================= */
-
-function doNext(){
-
-  if(pageFlip){
-
-    pageFlip.flipNext(
-      "bottom"
-    );
-
+    el.appendChild(img);
+    book.appendChild(el);
   }
 
-}
-
-
-function doPrev(){
-
-  if(pageFlip){
-
-    pageFlip.flipPrev(
-      "bottom"
-    );
-
-  }
-
-}
-
-
-prev.onclick =
-  doPrev;
-
-prevEdge.onclick =
-  doPrev;
-
-next.onclick =
-  doNext;
-
-nextEdge.onclick =
-  doNext;
-
-
-/* =========================================================
-   ZOOM CONTROLS
-========================================================= */
-
-zoomIn.onclick = () => {
-
-  zoom =
-    Math.min(
-      1.5,
-      zoom + .1
-    );
-
-  applyZoom();
-
-};
-
-
-zoomOut.onclick = () => {
-
-  zoom =
-    Math.max(
-      .8,
-      zoom - .1
-    );
-
-  applyZoom();
-
-};
-
-
-zoomLabel.onclick = () => {
-
-  zoom = 1;
-
-  applyZoom();
-
-};
-
-
-/* =========================================================
-   FULLSCREEN
-========================================================= */
-
-full.onclick =
-  async () => {
-
-    if(
-      !document.fullscreenElement
-    ){
-
-      await document
-        .documentElement
-        .requestFullscreen?.();
-
+  function update(index){
+    if(index <= 0){
+      info.textContent = "Cover";
+    }else if(index >= total-1){
+      info.textContent = "Back cover";
+    }else{
+      const a = index + 1;
+      const b = Math.min(index + 2,total);
+      info.textContent = a + "–" + b + " / " + total;
     }
 
-    else{
+    const first = index <= 0;
+    const last = index >= total-1;
 
-      await document
-        .exitFullscreen?.();
+    prev.disabled = first;
+    prevEdge.disabled = first;
+    next.disabled = last;
+    nextEdge.disabled = last;
 
-    }
+    book.classList.toggle("spread",index > 0 && index < total-1);
+  }
 
+  function goNext(){
+    if(flip) flip.flipNext("bottom");
+  }
+
+  function goPrev(){
+    if(flip) flip.flipPrev("bottom");
+  }
+
+  prev.onclick = goPrev;
+  prevEdge.onclick = goPrev;
+  next.onclick = goNext;
+  nextEdge.onclick = goNext;
+
+  document.addEventListener("keydown",function(e){
+    if(e.key === "ArrowRight") goNext();
+    if(e.key === "ArrowLeft") goPrev();
+  });
+
+  document.getElementById("zoomIn").onclick=function(){
+    zoom=Math.min(1.45,zoom+.1);
+    book.style.transform="scale("+zoom+")";
+    document.getElementById("zoomReset").textContent=Math.round(zoom*100)+"%";
   };
 
-
-/* =========================================================
-   KEYBOARD
-========================================================= */
-
-document.addEventListener(
-  "keydown",
-  event => {
-
-    if(
-      event.key ===
-      "ArrowRight" ||
-      event.key ===
-      "PageDown"
-    ){
-
-      doNext();
-
-    }
-
-
-    if(
-      event.key ===
-      "ArrowLeft" ||
-      event.key ===
-      "PageUp"
-    ){
-
-      doPrev();
-
-    }
-
-
-    if(event.key === "+"){
-
-      zoom =
-        Math.min(
-          1.5,
-          zoom + .1
-        );
-
-      applyZoom();
-
-    }
-
-
-    if(event.key === "-"){
-
-      zoom =
-        Math.max(
-          .8,
-          zoom - .1
-        );
-
-      applyZoom();
-
-    }
-
-
-    if(event.key === "0"){
-
-      zoom = 1;
-
-      applyZoom();
-
-    }
-
-
-    if(
-      event.key.toLowerCase()
-      === "f"
-    ){
-
-      full.click();
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   LOAD THE BOOK
-========================================================= */
-
-try{
-
-  pdf =
-    await pdfjsLib
-      .getDocument({
-        url:PDF_FILE
-      })
-      .promise;
-
-
-  total =
-    pdf.numPages;
-
-
-  setLoad(
-    `Preparing ${total} pages…`
-  );
-
-
-  /* Render every PDF page */
-
-  for(
-    let i = 1;
-    i <= total;
-    i++
-  ){
-
-    setLoad(
-      `Preparing page ${i} of ${total}…`
-    );
-
-    images.push(
-      await render(i)
-    );
-
-  }
-
-
-  /* Add pages to book */
-
-  images.forEach(
-    (src,index) => {
-
-      createPage(
-        src,
-        index
-      );
-
-    }
-  );
-
-
-  /* =======================================================
-     PAGE FLIP ENGINE
-  ======================================================= */
-
-  const PageFlip =
-    window.St.PageFlip;
-
-
-  if(!PageFlip){
-
-    throw new Error(
-      "Page flip library unavailable"
-    );
-
-  }
-
-
-  const aspect =
-    await pdf
-      .getPage(1)
-      .then(page =>
-        page.getViewport({
-          scale:1
-        })
-      );
-
-
-  pageFlip =
-    new PageFlip(
-      book,
-      {
-
-        width:
-          aspect.width,
-
-        height:
-          aspect.height,
-
-        size:
-          "stretch",
-
-        minWidth:
-          280,
-
-        maxWidth:
-          900,
-
-        minHeight:
-          396,
-
-        maxHeight:
-          1273,
-
-        drawShadow:
-          true,
-
-        maxShadowOpacity:
-          .42,
-
-        flippingTime:
-          780,
-
-        usePortrait:
-          true,
-
-        showCover:
-          true,
-
-        startPage:
-          0,
-
-        autoSize:
-          true,
-
-        mobileScrollSupport:
-          false,
-
-        swipeDistance:
-          35,
-
-        useMouseEvents:
-          true,
-
-        disableFlipByClick:
-          false
-
+  document.getElementById("zoomOut").onclick=function(){
+    zoom=Math.max(.75,zoom-.1);
+    book.style.transform="scale("+zoom+")";
+    document.getElementById("zoomReset").textContent=Math.round(zoom*100)+"%";
+  };
+
+  document.getElementById("zoomReset").onclick=function(){
+    zoom=1;
+    book.style.transform="scale(1)";
+    this.textContent="100%";
+  };
+
+  document.getElementById("full").onclick=async function(){
+    try{
+      if(!document.fullscreenElement){
+        await document.documentElement.requestFullscreen();
+      }else{
+        await document.exitFullscreen();
       }
-    );
+    }catch(e){}
+  };
 
+  async function start(){
 
-  /*
-    Load the rendered PDF pages.
-  */
-
-  pageFlip.loadFromHtml(
-    book.querySelectorAll(
-      ".page"
-    )
-  );
-
-
-  /* Page changed */
-
-  pageFlip.on(
-    "flip",
-    event => {
-
-      update(
-        event.data
-      );
-
+    if(!window.pdfjsLib){
+      fail("PDF.js failed to load. Check your internet connection.");
+      return;
     }
-  );
 
-
-  pageFlip.on(
-    "changeOrientation",
-    () => {
-
-      update(
-        pageFlip
-          .getCurrentPageIndex()
-      );
-
+    if(!window.St || !window.St.PageFlip){
+      fail("PageFlip failed to load. Check your internet connection.");
+      return;
     }
-  );
 
+    try{
+      loadText.textContent="Loading PDF…";
 
-  update(0);
+      const response = await fetch(PDF_FILE,{cache:"no-store"});
+      if(!response.ok){
+        throw new Error(
+          "The PDF could not be found. Make sure the filename is exactly: Annual report 25-26_V2.pdf"
+        );
+      }
 
+      const buffer = await response.arrayBuffer();
 
-  /* Hide loader */
+      const pdfDoc = await pdfjsLib.getDocument({
+        data:buffer
+      }).promise;
 
-  loader.style.opacity =
-    "0";
+      total = pdfDoc.numPages;
 
-  setTimeout(
-    () => {
+      if(total < 2){
+        throw new Error("The PDF must contain at least two pages.");
+      }
 
-      loader.style.display =
-        "none";
+      const first = await pdfDoc.getPage(1);
+      const viewport = first.getViewport({scale:1});
 
-    },
-    320
-  );
+      for(let i=1;i<=total;i++){
+        loadText.textContent =
+          "Preparing page " + i + " of " + total + "…";
 
+        const result = await pageImage(pdfDoc,i);
+        addPage(result.src,i-1);
+      }
 
-}
+      const pages = book.querySelectorAll(".page");
 
-catch(error){
+      flip = new St.PageFlip(book,{
+        width:viewport.width,
+        height:viewport.height,
 
-  console.error(error);
+        size:"stretch",
 
-  setLoad(
-    "Unable to open the annual report."
-  );
+        minWidth:280,
+        maxWidth:900,
+        minHeight:396,
+        maxHeight:1300,
 
-  document
-    .querySelector(
-      ".spinner"
-    )
-    .style.display =
-      "none";
+        showCover:true,
 
-}
+        drawShadow:true,
+        maxShadowOpacity:.38,
 
+        flippingTime:850,
+
+        usePortrait:true,
+
+        autoSize:true,
+
+        mobileScrollSupport:false,
+
+        swipeDistance:30,
+
+        showPageCorners:true,
+
+        disableFlipByClick:false
+      });
+
+      flip.loadFromHTML(pages);
+
+      flip.on("flip",function(e){
+        update(e.data);
+      });
+
+      flip.on("changeOrientation",function(){
+        update(flip.getCurrentPageIndex());
+      });
+
+      update(0);
+
+      loading.style.opacity="0";
+      setTimeout(function(){
+        loading.style.display="none";
+      },300);
+
+    }catch(err){
+      console.error(err);
+      fail(err.message || "The viewer could not be initialized.");
+    }
+  }
+
+  start();
+
+})();
 </script>
-
 </body>
 </html>
