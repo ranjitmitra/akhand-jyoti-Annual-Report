@@ -1,306 +1,354 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Akhand Jyoti — Annual Report 2025–26</title>
+
+<!-- Stable browser builds: avoids ES-module loading problems on static hosts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
+
 <style>
-:root{
-  --bg1:#3a3a3a;
-  --bg2:#181818;
-  --ui:rgba(22,22,22,.88);
-  --white:#fff;
-}
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden}
+html,body{width:100%;height:100%;margin:0;overflow:hidden}
 body{
-  background:
-    radial-gradient(ellipse at center 42%,#454545 0%,#2a2a2a 34%,#151515 76%,#0d0d0d 100%);
-  color:var(--white);
-  font-family:Arial,Helvetica,sans-serif;
+  background:radial-gradient(ellipse at center,#414141 0%,#282828 38%,#151515 78%,#0d0d0d 100%);
+  color:#fff;font-family:Arial,Helvetica,sans-serif
 }
-#reader{
-  position:relative;width:100%;height:100%;
-  display:flex;align-items:center;justify-content:center;
-  overflow:hidden;
-}
-#bookWrap{
-  position:relative;
-  width:min(94vw,1240px);
-  height:min(86vh,900px);
-  display:flex;align-items:center;justify-content:center;
-}
+#reader{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
 #book{
-  position:relative;
   margin:auto;
-  box-shadow:0 24px 55px rgba(0,0,0,.5);
+  width:min(94vw,1200px);
+  height:min(86vh,900px);
 }
 .page{
   background:#fff;
   overflow:hidden;
-  box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);
 }
 .page img{
-  width:100%;height:100%;display:block;
-  object-fit:contain;background:#fff;
-  user-select:none;-webkit-user-drag:none;
+  width:100%;height:100%;display:block;object-fit:contain;
+  background:#fff;user-select:none;-webkit-user-drag:none
 }
-.page-cover{
-  box-shadow:0 10px 30px rgba(0,0,0,.22);
+.page[data-density="hard"]{background:#fff}
+#title{
+  position:fixed;z-index:100;top:12px;left:50%;transform:translateX(-50%);
+  font-size:13px;font-weight:600;color:rgba(255,255,255,.78);
+  white-space:nowrap;pointer-events:none
 }
-#loader{
-  position:fixed;inset:0;z-index:1000;
+.edge{
+  position:fixed;z-index:200;top:50%;transform:translateY(-50%);
+  width:62px;height:118px;border:0;border-radius:14px;
+  background:rgba(18,18,18,.78);color:#fff;
+  box-shadow:0 8px 25px rgba(0,0,0,.38);
+  backdrop-filter:blur(8px);cursor:pointer;
   display:flex;align-items:center;justify-content:center;
-  background:#171717;
-  transition:opacity .3s;
+  transition:.18s
 }
-.loader-inner{text-align:center;color:#ddd;font-size:13px}
+.edge:hover{background:rgba(48,48,48,.95)}
+.edge:active{transform:translateY(-50%) scale(.95)}
+.edge span{font-size:58px;font-weight:200;line-height:1}
+#prevEdge{left:16px}
+#nextEdge{right:16px}
+.edge.disabled{opacity:.18;pointer-events:none}
+#controls{
+  position:fixed;z-index:300;bottom:14px;left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:6px;padding:7px 9px;
+  border-radius:12px;background:rgba(24,24,24,.9);
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 10px 30px rgba(0,0,0,.42);
+  backdrop-filter:blur(12px)
+}
+button.ctrl{
+  width:38px;height:35px;border:1px solid rgba(255,255,255,.13);
+  border-radius:7px;background:#303030;color:#fff;cursor:pointer;font-size:17px
+}
+button.ctrl:hover{background:#414141}
+button.ctrl:disabled{opacity:.35;cursor:not-allowed}
+#info{min-width:96px;text-align:center;font-size:12px;color:#ddd;font-variant-numeric:tabular-nums}
+#zoomLabel{width:48px;font-size:11px}
+#hint{position:fixed;z-index:100;right:16px;bottom:20px;color:rgba(255,255,255,.38);font-size:11px}
+#loading{
+  position:fixed;inset:0;z-index:1000;background:#151515;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .3s
+}
+.loader{text-align:center;color:#ddd;font-size:13px}
 .spinner{
-  width:34px;height:34px;margin:0 auto 13px;
-  border-radius:50%;
-  border:3px solid rgba(255,255,255,.18);
-  border-top-color:#fff;
-  animation:spin .8s linear infinite;
+  width:34px;height:34px;margin:0 auto 14px;border-radius:50%;
+  border:3px solid rgba(255,255,255,.18);border-top-color:#fff;
+  animation:spin .8s linear infinite
 }
 @keyframes spin{to{transform:rotate(360deg)}}
-#title{
-  position:fixed;z-index:500;top:12px;left:50%;
-  transform:translateX(-50%);
-  font-size:13px;font-weight:600;color:rgba(255,255,255,.78);
-  pointer-events:none;white-space:nowrap;
+#error{
+  display:none;position:fixed;inset:0;z-index:1100;
+  align-items:center;justify-content:center;text-align:center;
+  background:#151515;color:#ccc;padding:30px
 }
-.edgeNav{
-  position:fixed;z-index:700;
-  top:50%;transform:translateY(-50%);
-  width:58px;height:116px;
-  border:0;border-radius:14px;
-  background:rgba(18,18,18,.72);
-  color:#fff;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 7px 22px rgba(0,0,0,.32);
-  backdrop-filter:blur(8px);
-  transition:background .2s,opacity .2s,transform .2s;
-}
-.edgeNav:hover{background:rgba(40,40,40,.94)}
-.edgeNav:active{transform:translateY(-50%) scale(.96)}
-.edgeNav span{
-  font-size:54px;font-weight:200;line-height:1;
-  margin-top:-4px;
-}
-#prevEdge{left:18px}
-#nextEdge{right:18px}
-.edgeNav.disabled{opacity:.18;pointer-events:none}
-#controls{
-  position:fixed;z-index:800;left:50%;bottom:14px;
-  transform:translateX(-50%);
-  display:flex;align-items:center;gap:6px;
-  padding:7px 9px;border-radius:12px;
-  background:var(--ui);
-  border:1px solid rgba(255,255,255,.13);
-  box-shadow:0 9px 28px rgba(0,0,0,.42);
-  backdrop-filter:blur(12px);
-}
-.control{
-  width:38px;height:35px;border:1px solid rgba(255,255,255,.12);
-  border-radius:7px;background:#303030;color:#fff;
-  cursor:pointer;font-size:16px;
-}
-.control:hover{background:#414141}
-#pageInfo{
-  min-width:95px;text-align:center;font-size:12px;
-  color:#ddd;font-variant-numeric:tabular-nums;
-}
-#zoomLabel{width:48px;font-size:11px}
-#hint{
-  position:fixed;z-index:500;right:16px;bottom:20px;
-  font-size:11px;color:rgba(255,255,255,.38);
-}
+#error div{max-width:650px}
+#error h3{color:#fff}
 @media(max-width:850px){
-  #bookWrap{width:100vw;height:82vh}
-  .edgeNav{width:46px;height:92px;border-radius:10px}
-  .edgeNav span{font-size:42px}
-  #prevEdge{left:6px}
-  #nextEdge{right:6px}
-  #title{font-size:11px;max-width:88%;overflow:hidden;text-overflow:ellipsis}
+  #book{width:100vw;height:82vh}
+  .edge{width:48px;height:92px}
+  .edge span{font-size:44px}
+  #prevEdge{left:5px}#nextEdge{right:5px}
   #hint{display:none}
 }
 @media(max-width:520px){
   #controls{bottom:7px}
-  .control{width:34px;height:33px}
-  #pageInfo{min-width:74px}
+  button.ctrl{width:34px;height:33px}
+  #info{min-width:76px}
+  #title{font-size:11px;max-width:88%;overflow:hidden;text-overflow:ellipsis}
 }
 </style>
 </head>
+
 <body>
 <div id="reader">
-  <div id="bookWrap"><div id="book"></div></div>
+  <div id="book"></div>
 </div>
 
 <div id="title">Akhand Jyoti — Annual Report 2025–26</div>
 
-<!-- Prominent Heyzine-style page-turn markers -->
-<button id="prevEdge" class="edgeNav disabled" aria-label="Previous page" title="Previous page">
-  <span>‹</span>
-</button>
-<button id="nextEdge" class="edgeNav" aria-label="Next page" title="Next page">
-  <span>›</span>
-</button>
+<button id="prevEdge" class="edge disabled" aria-label="Previous page"><span>‹</span></button>
+<button id="nextEdge" class="edge" aria-label="Next page"><span>›</span></button>
 
 <div id="controls">
-  <button class="control" id="prev" title="Previous page">‹</button>
-  <div id="pageInfo">Cover</div>
-  <button class="control" id="next" title="Next page">›</button>
-  <button class="control" id="zoomOut" title="Zoom out">−</button>
-  <button class="control" id="zoomLabel" title="Reset zoom">100%</button>
-  <button class="control" id="zoomIn" title="Zoom in">+</button>
-  <button class="control" id="full" title="Fullscreen">⛶</button>
+  <button id="prev" class="ctrl" title="Previous page">‹</button>
+  <div id="info">Cover</div>
+  <button id="next" class="ctrl" title="Next page">›</button>
+  <button id="zoomOut" class="ctrl" title="Zoom out">−</button>
+  <button id="zoomLabel" class="ctrl" title="Reset zoom">100%</button>
+  <button id="zoomIn" class="ctrl" title="Zoom in">+</button>
+  <button id="full" class="ctrl" title="Fullscreen">⛶</button>
 </div>
-<div id="hint">Drag a page corner or use the arrows</div>
 
-<div id="loader">
-  <div class="loader-inner">
+<div id="hint">Drag the page corner or use the arrows</div>
+
+<div id="loading">
+  <div class="loader">
     <div class="spinner"></div>
-    <div id="loadText">Preparing your annual report…</div>
+    <div id="loadingText">Opening annual report…</div>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
-<script type="module">
-const pdfjsLib = await import("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs");
+<div id="error">
+  <div>
+    <h3>Unable to open the annual report</h3>
+    <p id="errorText">Please refresh the page and try again.</p>
+  </div>
+</div>
+
+<script>
 pdfjsLib.GlobalWorkerOptions.workerSrc =
-  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs";
+  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
-const PDF_FILE="Annual report 25-26_V2.pdf";
-const book=document.getElementById("book");
-const wrap=document.getElementById("bookWrap");
-const loader=document.getElementById("loader");
-const loadText=document.getElementById("loadText");
-const info=document.getElementById("pageInfo");
-const prev=document.getElementById("prev");
-const next=document.getElementById("next");
-const prevEdge=document.getElementById("prevEdge");
-const nextEdge=document.getElementById("nextEdge");
-const zoomIn=document.getElementById("zoomIn");
-const zoomOut=document.getElementById("zoomOut");
-const zoomLabel=document.getElementById("zoomLabel");
-const full=document.getElementById("full");
+const PDF_FILE = "Annual%20report%2025-26_V2.pdf";
 
-let pdf=null,pageFlip=null,images=[],zoom=1,total=82;
+const book = document.getElementById("book");
+const loading = document.getElementById("loading");
+const loadingText = document.getElementById("loadingText");
+const errorBox = document.getElementById("error");
+const errorText = document.getElementById("errorText");
+const info = document.getElementById("info");
+const prev = document.getElementById("prev");
+const next = document.getElementById("next");
+const prevEdge = document.getElementById("prevEdge");
+const nextEdge = document.getElementById("nextEdge");
+const zoomIn = document.getElementById("zoomIn");
+const zoomOut = document.getElementById("zoomOut");
+const zoomLabel = document.getElementById("zoomLabel");
+const full = document.getElementById("full");
 
-function setLoad(t){loadText.textContent=t}
+let flip = null;
+let pdf = null;
+let total = 0;
+let zoom = 1;
 
-function createPage(src,i){
-  const p=document.createElement("div");
-  p.className="page"+(i===0||i===total-1?" page-cover":"");
-  if(i===0||i===total-1)p.dataset.density="hard";
-  const img=document.createElement("img");
-  img.src=src;img.alt="Annual Report page "+(i+1);
-  p.appendChild(img);book.appendChild(p);
+function setLoading(text){ loadingText.textContent = text; }
+
+function showError(message){
+  loading.style.display = "none";
+  errorBox.style.display = "flex";
+  errorText.textContent = message;
 }
 
-async function render(n){
-  const page=await pdf.getPage(n);
-  const vp=page.getViewport({scale:1});
-  const s=1.25;
-  const v=page.getViewport({scale:s});
-  const c=document.createElement("canvas");
-  const ctx=c.getContext("2d",{alpha:false});
-  c.width=Math.ceil(v.width);c.height=Math.ceil(v.height);
-  await page.render({canvasContext:ctx,viewport:v}).promise;
-  return c.toDataURL("image/jpeg",.9);
-}
-
-function update(index){
-  // page-flip index is zero based. In cover mode, the first and last pages
-  // are shown alone; interior pages are naturally displayed as spreads.
-  if(index===0)info.textContent="Cover";
-  else if(index===total-1)info.textContent="Back cover";
-  else{
-    const a=index+1;
-    const b=Math.min(index+2,total-1);
-    info.textContent=`${a}–${b} / ${total}`;
+function makePage(dataUrl, index){
+  const div = document.createElement("div");
+  div.className = "page";
+  if(index === 0 || index === total - 1){
+    div.dataset.density = "hard";
   }
-  const atStart=index===0,atEnd=index===total-1;
-  prev.disabled=atStart;prevEdge.classList.toggle("disabled",atStart);
-  next.disabled=atEnd;nextEdge.classList.toggle("disabled",atEnd);
+  const img = document.createElement("img");
+  img.src = dataUrl;
+  img.alt = "Annual Report page " + (index + 1);
+  div.appendChild(img);
+  return div;
 }
 
-function applyZoom(){
-  book.style.transform=`scale(${zoom})`;
-  zoomLabel.textContent=Math.round(zoom*100)+"%";
+async function renderPage(pageNumber){
+  const page = await pdf.getPage(pageNumber);
+  const viewport = page.getViewport({scale: 1.35});
+
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d", {alpha:false});
+  canvas.width = Math.ceil(viewport.width);
+  canvas.height = Math.ceil(viewport.height);
+
+  await page.render({
+    canvasContext: context,
+    viewport: viewport
+  }).promise;
+
+  return canvas.toDataURL("image/jpeg", 0.90);
 }
 
-function doNext(){if(pageFlip)pageFlip.flipNext("bottom")}
-function doPrev(){if(pageFlip)pageFlip.flipPrev("bottom")}
+function updateNavigation(index){
+  const atStart = index === 0;
+  const atEnd = index === total - 1;
 
-prev.onclick=doPrev;prevEdge.onclick=doPrev;
-next.onclick=doNext;nextEdge.onclick=doNext;
-zoomIn.onclick=()=>{zoom=Math.min(1.5,zoom+.1);applyZoom()};
-zoomOut.onclick=()=>{zoom=Math.max(.8,zoom-.1);applyZoom()};
-zoomLabel.onclick=()=>{zoom=1;applyZoom()};
-full.onclick=async()=>{
-  if(!document.fullscreenElement)await document.documentElement.requestFullscreen?.();
-  else await document.exitFullscreen?.();
+  if(atStart) info.textContent = "Cover";
+  else if(atEnd) info.textContent = "Back cover";
+  else {
+    const first = index + 1;
+    const second = Math.min(index + 2, total - 1);
+    info.textContent = first + "–" + second + " / " + total;
+  }
+
+  prev.disabled = atStart;
+  next.disabled = atEnd;
+  prevEdge.classList.toggle("disabled", atStart);
+  nextEdge.classList.toggle("disabled", atEnd);
+}
+
+function goNext(){
+  if(flip) flip.flipNext("bottom");
+}
+function goPrev(){
+  if(flip) flip.flipPrev("bottom");
+}
+
+prev.onclick = goPrev;
+prevEdge.onclick = goPrev;
+next.onclick = goNext;
+nextEdge.onclick = goNext;
+
+zoomIn.onclick = ()=>{
+  zoom = Math.min(1.5, zoom + .1);
+  book.style.transform = "scale(" + zoom + ")";
+  zoomLabel.textContent = Math.round(zoom*100) + "%";
+};
+zoomOut.onclick = ()=>{
+  zoom = Math.max(.8, zoom - .1);
+  book.style.transform = "scale(" + zoom + ")";
+  zoomLabel.textContent = Math.round(zoom*100) + "%";
+};
+zoomLabel.onclick = ()=>{
+  zoom = 1;
+  book.style.transform = "scale(1)";
+  zoomLabel.textContent = "100%";
 };
 
-document.addEventListener("keydown",e=>{
-  if(e.key==="ArrowRight"||e.key==="PageDown")doNext();
-  if(e.key==="ArrowLeft"||e.key==="PageUp")doPrev();
-  if(e.key==="+"){zoom=Math.min(1.5,zoom+.1);applyZoom()}
-  if(e.key==="-"){zoom=Math.max(.8,zoom-.1);applyZoom()}
-  if(e.key==="0"){zoom=1;applyZoom()}
-  if(e.key.toLowerCase()==="f")full.click();
+full.onclick = async ()=>{
+  if(!document.fullscreenElement){
+    await document.documentElement.requestFullscreen?.();
+  }else{
+    await document.exitFullscreen?.();
+  }
+};
+
+document.addEventListener("keydown", e=>{
+  if(e.key === "ArrowRight" || e.key === "PageDown") goNext();
+  if(e.key === "ArrowLeft" || e.key === "PageUp") goPrev();
+  if(e.key === "+") zoomIn.click();
+  if(e.key === "-") zoomOut.click();
+  if(e.key === "0") zoomLabel.click();
 });
 
-try{
-  pdf=await pdfjsLib.getDocument({url:PDF_FILE}).promise;
-  total=pdf.numPages;
-  setLoad(`Preparing ${total} pages…`);
+async function start(){
+  try{
+    setLoading("Loading PDF…");
 
-  for(let i=1;i<=total;i++){
-    setLoad(`Preparing page ${i} of ${total}…`);
-    images.push(await render(i));
+    // Fetch the PDF explicitly. This avoids PDF.js URL/path problems caused by
+    // spaces in the GitHub Pages filename.
+    const response = await fetch(PDF_FILE, {cache:"no-store"});
+    if(!response.ok){
+      throw new Error("PDF request returned HTTP " + response.status);
+    }
+
+    const buffer = await response.arrayBuffer();
+
+    setLoading("Reading annual report…");
+    pdf = await pdfjsLib.getDocument({data:buffer}).promise;
+    total = pdf.numPages;
+
+    if(total < 2) throw new Error("The PDF contains only one page.");
+
+    book.innerHTML = "";
+
+    // Render pages first. This makes the flipbook independent of the PDF
+    // once it starts and gives the page-flip engine ordinary HTML pages.
+    for(let i=1;i<=total;i++){
+      setLoading("Preparing page " + i + " of " + total + "…");
+      const image = await renderPage(i);
+      book.appendChild(makePage(image, i-1));
+    }
+
+    setLoading("Starting magazine…");
+
+    const first = await pdf.getPage(1);
+    const size = first.getViewport({scale:1});
+
+    if(!window.St || !window.St.PageFlip){
+      throw new Error("The page-flip library did not load.");
+    }
+
+    flip = new St.PageFlip(book, {
+      width: size.width,
+      height: size.height,
+      size: "stretch",
+      minWidth: 280,
+      maxWidth: 1000,
+      minHeight: 396,
+      maxHeight: 1350,
+      drawShadow: true,
+      maxShadowOpacity: .45,
+      flippingTime: 800,
+      usePortrait: true,
+      showCover: true,
+      autoSize: true,
+      mobileScrollSupport: false,
+      swipeDistance: 30,
+      useMouseEvents: true,
+      disableFlipByClick: false,
+      startPage: 0
+    });
+
+    flip.loadFromHTML(book.querySelectorAll(".page"));
+
+    flip.on("flip", function(e){
+      updateNavigation(e.data);
+    });
+
+    flip.on("changeOrientation", function(){
+      updateNavigation(flip.getCurrentPageIndex());
+    });
+
+    updateNavigation(0);
+
+    loading.style.opacity = "0";
+    setTimeout(()=>loading.style.display="none",350);
+
+  }catch(err){
+    console.error(err);
+    showError(
+      "The viewer could not load the PDF. " +
+      (err && err.message ? err.message : "Unknown error.")
+    );
   }
-
-  images.forEach((src,i)=>createPage(src,i));
-
-  const PageFlip=window.St.PageFlip;
-  if(!PageFlip)throw new Error("Page flip library unavailable");
-
-  const aspect=await pdf.getPage(1).then(p=>p.getViewport({scale:1}));
-  pageFlip=new PageFlip(book,{
-    width:aspect.width,
-    height:aspect.height,
-    size:"stretch",
-    minWidth:280,
-    maxWidth:900,
-    minHeight:396,
-    maxHeight:1273,
-    drawShadow:true,
-    maxShadowOpacity:.42,
-    flippingTime:780,
-    usePortrait:true,
-    showCover:true,
-    startPage:0,
-    autoSize:true,
-    mobileScrollSupport:false,
-    swipeDistance:35,
-    useMouseEvents:true,
-    disableFlipByClick:false
-  });
-
-  pageFlip.loadFromHtml(book.querySelectorAll(".page"));
-  pageFlip.on("flip",e=>update(e.data));
-  pageFlip.on("changeOrientation",()=>update(pageFlip.getCurrentPageIndex()));
-  update(0);
-
-  loader.style.opacity="0";
-  setTimeout(()=>loader.style.display="none",320);
-}catch(err){
-  console.error(err);
-  setLoad("Unable to open the annual report.");
-  document.querySelector(".spinner").style.display="none";
 }
+
+start();
 </script>
 </body>
 </html>
