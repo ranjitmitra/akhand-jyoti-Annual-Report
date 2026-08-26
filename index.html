@@ -5,284 +5,302 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Akhand Jyoti — Annual Report 2025–26</title>
 <style>
-*{box-sizing:border-box}
-html,body{width:100%;height:100%;margin:0;overflow:hidden}
-body{
-  background:radial-gradient(circle at 50% 45%,#2b2b2b 0,#171717 55%,#0d0d0d 100%);
-  color:#fff;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+:root{
+  --bg1:#3a3a3a;
+  --bg2:#181818;
+  --ui:rgba(22,22,22,.88);
+  --white:#fff;
 }
-#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:42px 18px 70px}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{
+  background:
+    radial-gradient(ellipse at center 42%,#454545 0%,#2a2a2a 34%,#151515 76%,#0d0d0d 100%);
+  color:var(--white);
+  font-family:Arial,Helvetica,sans-serif;
+}
+#reader{
+  position:relative;width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+#bookWrap{
+  position:relative;
+  width:min(94vw,1240px);
+  height:min(86vh,900px);
+  display:flex;align-items:center;justify-content:center;
+}
 #book{
   position:relative;
-  width:min(94vw,1100px);
-  height:min(80vh,760px);
-  perspective:2600px;
-  transform-style:preserve-3d;
-  filter:drop-shadow(0 25px 35px rgba(0,0,0,.55));
+  margin:auto;
+  box-shadow:0 24px 55px rgba(0,0,0,.5);
 }
 .page{
-  position:absolute;overflow:hidden;background:#fff;
-  top:0;height:100%;width:50%;
-  border:1px solid rgba(0,0,0,.18);
-  backface-visibility:hidden;
+  background:#fff;
+  overflow:hidden;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);
 }
-.page img{width:100%;height:100%;object-fit:contain;display:block;background:#fff}
-.left{left:0;border-radius:5px 0 0 5px;box-shadow:inset -18px 0 28px -28px #000}
-.right{right:0;border-radius:0 5px 5px 0;box-shadow:inset 18px 0 28px -28px #000}
-.single{left:25%;width:50%;border-radius:5px}
-.spine{
-  position:absolute;z-index:40;left:50%;top:0;bottom:0;width:5px;
-  transform:translateX(-50%);
-  background:linear-gradient(90deg,rgba(0,0,0,.28),rgba(255,255,255,.22),rgba(0,0,0,.3));
-  box-shadow:0 0 9px rgba(0,0,0,.35);pointer-events:none;
+.page img{
+  width:100%;height:100%;display:block;
+  object-fit:contain;background:#fff;
+  user-select:none;-webkit-user-drag:none;
 }
-#book.cover #spine,#book.back #spine{display:none}
-
-/* The actual sheet being turned. Its front/back are full page halves. */
-.turn{
-  position:absolute;z-index:30;top:0;height:100%;width:50%;
-  transform-style:preserve-3d;display:none;backface-visibility:hidden;
+.page-cover{
+  box-shadow:0 10px 30px rgba(0,0,0,.22);
 }
-.turn.rightTurn{left:50%;transform-origin:left center}
-.turn.leftTurn{left:0;transform-origin:right center}
-.turn .face{
-  position:absolute;inset:0;background:#fff;overflow:hidden;
-  backface-visibility:hidden;border:1px solid rgba(0,0,0,.18);
+#loader{
+  position:fixed;inset:0;z-index:1000;
+  display:flex;align-items:center;justify-content:center;
+  background:#171717;
+  transition:opacity .3s;
 }
-.turn img{width:100%;height:100%;object-fit:contain;display:block}
-.turn .backFace{transform:rotateY(180deg)}
-.turn.rightTurn.animate{transform:rotateY(-180deg)}
-.turn.leftTurn.animate{transform:rotateY(180deg)}
-.turn{transition:transform .82s cubic-bezier(.18,.70,.20,1)}
-.no-motion .turn{transition:none}
-
-#book.cover .page.left,#book.cover .page.right,
-#book.back .page.left,#book.back .page.right{display:none}
-
-.edgeGlow{position:absolute;z-index:50;top:0;bottom:0;width:18px;pointer-events:none;opacity:0}
-.edgeGlow.r{right:0;background:linear-gradient(90deg,transparent,rgba(0,0,0,.24))}
-.edgeGlow.l{left:0;background:linear-gradient(270deg,transparent,rgba(0,0,0,.24))}
-.edgeGlow.show{opacity:1}
-
-#controls{
- position:fixed;z-index:100;left:50%;bottom:14px;transform:translateX(-50%);
- display:flex;gap:7px;align-items:center;padding:7px 9px;border-radius:13px;
- background:rgba(25,25,25,.92);border:1px solid rgba(255,255,255,.13);
- box-shadow:0 9px 28px rgba(0,0,0,.4);backdrop-filter:blur(12px)
+.loader-inner{text-align:center;color:#ddd;font-size:13px}
+.spinner{
+  width:34px;height:34px;margin:0 auto 13px;
+  border-radius:50%;
+  border:3px solid rgba(255,255,255,.18);
+  border-top-color:#fff;
+  animation:spin .8s linear infinite;
 }
-button{
- height:36px;min-width:38px;padding:0 11px;border-radius:8px;
- border:1px solid rgba(255,255,255,.13);background:#303030;color:#fff;
- cursor:pointer;font-size:15px
-}
-button:hover{background:#3c3c3c}
-button:disabled{opacity:.35;cursor:not-allowed}
-#info{min-width:92px;text-align:center;font-size:13px;color:#ddd;font-variant-numeric:tabular-nums}
+@keyframes spin{to{transform:rotate(360deg)}}
 #title{
- position:fixed;z-index:100;top:14px;left:50%;transform:translateX(-50%);
- font-size:13px;font-weight:600;letter-spacing:.2px;color:rgba(255,255,255,.82);
- white-space:nowrap
+  position:fixed;z-index:500;top:12px;left:50%;
+  transform:translateX(-50%);
+  font-size:13px;font-weight:600;color:rgba(255,255,255,.78);
+  pointer-events:none;white-space:nowrap;
 }
-#hint{position:fixed;right:15px;bottom:18px;color:rgba(255,255,255,.42);font-size:11px}
-#status{
- position:fixed;left:14px;bottom:14px;z-index:120;padding:7px 10px;border-radius:8px;
- background:rgba(0,0,0,.68);border:1px solid rgba(255,255,255,.1);font-size:12px
+.edgeNav{
+  position:fixed;z-index:700;
+  top:50%;transform:translateY(-50%);
+  width:58px;height:116px;
+  border:0;border-radius:14px;
+  background:rgba(18,18,18,.72);
+  color:#fff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 7px 22px rgba(0,0,0,.32);
+  backdrop-filter:blur(8px);
+  transition:background .2s,opacity .2s,transform .2s;
 }
-@media(max-width:800px){
- #stage{padding:48px 8px 66px}
- #book{width:96vw;height:min(76vh,620px)}
- #title{max-width:90vw;overflow:hidden;text-overflow:ellipsis;font-size:12px}
- #hint{display:none}
+.edgeNav:hover{background:rgba(40,40,40,.94)}
+.edgeNav:active{transform:translateY(-50%) scale(.96)}
+.edgeNav span{
+  font-size:54px;font-weight:200;line-height:1;
+  margin-top:-4px;
+}
+#prevEdge{left:18px}
+#nextEdge{right:18px}
+.edgeNav.disabled{opacity:.18;pointer-events:none}
+#controls{
+  position:fixed;z-index:800;left:50%;bottom:14px;
+  transform:translateX(-50%);
+  display:flex;align-items:center;gap:6px;
+  padding:7px 9px;border-radius:12px;
+  background:var(--ui);
+  border:1px solid rgba(255,255,255,.13);
+  box-shadow:0 9px 28px rgba(0,0,0,.42);
+  backdrop-filter:blur(12px);
+}
+.control{
+  width:38px;height:35px;border:1px solid rgba(255,255,255,.12);
+  border-radius:7px;background:#303030;color:#fff;
+  cursor:pointer;font-size:16px;
+}
+.control:hover{background:#414141}
+#pageInfo{
+  min-width:95px;text-align:center;font-size:12px;
+  color:#ddd;font-variant-numeric:tabular-nums;
+}
+#zoomLabel{width:48px;font-size:11px}
+#hint{
+  position:fixed;z-index:500;right:16px;bottom:20px;
+  font-size:11px;color:rgba(255,255,255,.38);
+}
+@media(max-width:850px){
+  #bookWrap{width:100vw;height:82vh}
+  .edgeNav{width:46px;height:92px;border-radius:10px}
+  .edgeNav span{font-size:42px}
+  #prevEdge{left:6px}
+  #nextEdge{right:6px}
+  #title{font-size:11px;max-width:88%;overflow:hidden;text-overflow:ellipsis}
+  #hint{display:none}
+}
+@media(max-width:520px){
+  #controls{bottom:7px}
+  .control{width:34px;height:33px}
+  #pageInfo{min-width:74px}
 }
 </style>
 </head>
 <body>
-<div id="title">Akhand Jyoti — Annual Report 2025–26</div>
-<div id="stage">
-  <div id="book" class="cover">
-    <div class="page single" id="single"><img id="singleImg"></div>
-    <div class="page left" id="left"><img id="leftImg"></div>
-    <div class="page right" id="right"><img id="rightImg"></div>
-    <div class="spine" id="spine"></div>
+<div id="reader">
+  <div id="bookWrap"><div id="book"></div></div>
+</div>
 
-    <div class="turn rightTurn" id="rightTurn">
-      <div class="face frontFace"><img id="rtFront"></div>
-      <div class="face backFace"><img id="rtBack"></div>
-    </div>
-    <div class="turn leftTurn" id="leftTurn">
-      <div class="face frontFace"><img id="ltFront"></div>
-      <div class="face backFace"><img id="ltBack"></div>
-    </div>
-    <div class="edgeGlow r" id="glowR"></div>
-    <div class="edgeGlow l" id="glowL"></div>
+<div id="title">Akhand Jyoti — Annual Report 2025–26</div>
+
+<!-- Prominent Heyzine-style page-turn markers -->
+<button id="prevEdge" class="edgeNav disabled" aria-label="Previous page" title="Previous page">
+  <span>‹</span>
+</button>
+<button id="nextEdge" class="edgeNav" aria-label="Next page" title="Next page">
+  <span>›</span>
+</button>
+
+<div id="controls">
+  <button class="control" id="prev" title="Previous page">‹</button>
+  <div id="pageInfo">Cover</div>
+  <button class="control" id="next" title="Next page">›</button>
+  <button class="control" id="zoomOut" title="Zoom out">−</button>
+  <button class="control" id="zoomLabel" title="Reset zoom">100%</button>
+  <button class="control" id="zoomIn" title="Zoom in">+</button>
+  <button class="control" id="full" title="Fullscreen">⛶</button>
+</div>
+<div id="hint">Drag a page corner or use the arrows</div>
+
+<div id="loader">
+  <div class="loader-inner">
+    <div class="spinner"></div>
+    <div id="loadText">Preparing your annual report…</div>
   </div>
 </div>
 
-<div id="controls">
- <button id="prev" title="Previous page">‹</button>
- <div id="info">Cover</div>
- <button id="next" title="Next page">›</button>
- <button id="minus" title="Zoom out">−</button>
- <button id="zoom">100%</button>
- <button id="plus" title="Zoom in">+</button>
- <button id="full" title="Fullscreen">⛶</button>
-</div>
-<div id="hint">← → or click the page edges</div>
-<div id="status">Opening report…</div>
-
+<script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
 <script type="module">
-const pdfjsLib=await import("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs");
-pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs";
+const pdfjsLib = await import("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs");
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs";
 
-const FILE="Annual report 25-26_V2.pdf", TOTAL=82;
-const $=id=>document.getElementById(id);
-const book=$("book"), single=$("single"), left=$("left"), right=$("right");
-const singleImg=$("singleImg"), leftImg=$("leftImg"), rightImg=$("rightImg");
-const rt=$("rightTurn"), lt=$("leftTurn"), rtFront=$("rtFront"),rtBack=$("rtBack");
-const ltFront=$("ltFront"),ltBack=$("ltBack"), info=$("info"), status=$("status");
-const prev=$("prev"),next=$("next"), zoom=$("zoom"), glowR=$("glowR"),glowL=$("glowL");
+const PDF_FILE="Annual report 25-26_V2.pdf";
+const book=document.getElementById("book");
+const wrap=document.getElementById("bookWrap");
+const loader=document.getElementById("loader");
+const loadText=document.getElementById("loadText");
+const info=document.getElementById("pageInfo");
+const prev=document.getElementById("prev");
+const next=document.getElementById("next");
+const prevEdge=document.getElementById("prevEdge");
+const nextEdge=document.getElementById("nextEdge");
+const zoomIn=document.getElementById("zoomIn");
+const zoomOut=document.getElementById("zoomOut");
+const zoomLabel=document.getElementById("zoomLabel");
+const full=document.getElementById("full");
 
-let pdf, state="cover", scale=1, busy=false, baseRatio=.707;
+let pdf=null,pageFlip=null,images=[],zoom=1,total=82;
 
-function msg(t,show=true){status.textContent=t;status.hidden=!show}
-function spreadStart(){return state==="spread"?window.spread:0}
-function update(){
-  if(state==="cover") info.textContent="Cover";
-  else if(state==="back") info.textContent=`Back cover • ${TOTAL}`;
-  else info.textContent=`${window.spread}–${window.spread+1} / ${TOTAL}`;
-  prev.disabled=state==="cover";
-  next.disabled=state==="back";
-  zoom.textContent=Math.round(scale*100)+"%";
+function setLoad(t){loadText.textContent=t}
+
+function createPage(src,i){
+  const p=document.createElement("div");
+  p.className="page"+(i===0||i===total-1?" page-cover":"");
+  if(i===0||i===total-1)p.dataset.density="hard";
+  const img=document.createElement("img");
+  img.src=src;img.alt="Annual Report page "+(i+1);
+  p.appendChild(img);book.appendChild(p);
 }
+
 async function render(n){
-  const p=await pdf.getPage(n);
-  const vp=p.getViewport({scale:Math.max(.65,Math.min(2.4,scale))});
-  const c=document.createElement("canvas"),ctx=c.getContext("2d");
-  c.width=Math.ceil(vp.width);c.height=Math.ceil(vp.height);
-  await p.render({canvasContext:ctx,viewport:vp}).promise;
+  const page=await pdf.getPage(n);
+  const vp=page.getViewport({scale:1});
+  const s=1.25;
+  const v=page.getViewport({scale:s});
+  const c=document.createElement("canvas");
+  const ctx=c.getContext("2d",{alpha:false});
+  c.width=Math.ceil(v.width);c.height=Math.ceil(v.height);
+  await page.render({canvasContext:ctx,viewport:v}).promise;
   return c.toDataURL("image/jpeg",.9);
 }
-function fit(){
-  const maxH=Math.min(window.innerHeight*.79,window.innerHeight-115);
-  const maxW=Math.min(window.innerWidth*.94,window.innerWidth-30);
-  let h=maxH,w=h/baseRatio;
-  if(state==="cover"||state==="back"){
-    if(w>maxW*.52){w=maxW*.52;h=w*baseRatio}
-    book.style.width=w+"px";
-  }else{
-    if(w*2>maxW){w=maxW/2;h=w*baseRatio}
-    book.style.width=(w*2)+"px";
-  }
-  book.style.height=h+"px";
-}
-function resetTurn(){
-  rt.style.display="none";lt.style.display="none";
-  rt.classList.remove("animate");lt.classList.remove("animate");
-  glowR.classList.remove("show");glowL.classList.remove("show");
-}
-async function draw(){
-  resetTurn();msg("Loading page…");
-  if(state==="cover"){
-    book.className="cover";
-    singleImg.src=await render(1);
-  }else if(state==="back"){
-    book.className="back";
-    singleImg.src=await render(TOTAL);
-  }else{
-    book.className="spread";
-    leftImg.src=await render(window.spread);
-    rightImg.src=await render(window.spread+1);
-  }
-  fit();update();msg("",false);
-}
-async function openCover(){
-  if(busy)return;busy=true;msg("Opening…");resetTurn();
-  // The cover is a single sheet. Its front is page 1; the back is the first
-  // interior page (2), and the spread underneath is 2–3.
-  await Promise.all([render(2).then(x=>rtBack.src=x),render(1).then(x=>rtFront.src=x)]);
-  leftImg.src=await render(2);rightImg.src=await render(3);
-  book.className="cover";
-  single.style.display="block";
-  rt.style.display="block";glowR.classList.add("show");
-  requestAnimationFrame(()=>rt.classList.add("animate"));
-  setTimeout(async()=>{
-    state="spread";window.spread=2;single.style.display="none";
-    rt.style.display="none";await draw();busy=false;
-  },820);
-}
-async function closeToCover(){
-  if(busy)return;busy=true;msg("Closing…");resetTurn();
-  rtFront.src=await render(2);rtBack.src=await render(1);
-  single.style.display="none";rt.style.display="block";glowL.classList.add("show");
-  rt.classList.remove("rightTurn");rt.classList.add("leftTurn");
-  requestAnimationFrame(()=>rt.classList.add("animate"));
-  setTimeout(async()=>{rt.className="turn rightTurn";state="cover";await draw();busy=false},820);
-}
-async function nextPage(){
-  if(busy)return;
-  if(state==="cover"){await openCover();return}
-  if(state==="back")return;
-  if(window.spread===80){ // turn page 81 to reveal the back cover 82
-    busy=true;msg("Turning…");resetTurn();
-    rtFront.src=await render(81);rtBack.src=await render(82);
-    rt.style.display="block";glowR.classList.add("show");
-    requestAnimationFrame(()=>rt.classList.add("animate"));
-    setTimeout(async()=>{state="back";rt.style.display="none";await draw();busy=false},820);
-    return;
-  }
-  busy=true;msg("Turning…");resetTurn();
-  const nextSpread=window.spread+2;
-  rtFront.src=await render(window.spread+1);
-  rtBack.src=await render(nextSpread);
-  rt.style.display="block";glowR.classList.add("show");
-  requestAnimationFrame(()=>rt.classList.add("animate"));
-  setTimeout(async()=>{window.spread=nextSpread;rt.style.display="none";await draw();busy=false},820);
-}
-async function prevPage(){
-  if(busy)return;
-  if(state==="back"){
-    busy=true;msg("Turning…");resetTurn();
-    ltFront.src=await render(82);ltBack.src=await render(81);
-    lt.style.display="block";glowL.classList.add("show");
-    requestAnimationFrame(()=>lt.classList.add("animate"));
-    setTimeout(async()=>{state="spread";window.spread=80;lt.style.display="none";await draw();busy=false},820);
-    return;
-  }
-  if(state==="cover")return;
-  if(window.spread===2){await closeToCover();return}
-  busy=true;msg("Turning…");resetTurn();
-  const prevSpread=window.spread-2;
-  ltFront.src=await render(window.spread);ltBack.src=await render(window.spread-1);
-  lt.style.display="block";glowL.classList.add("show");
-  requestAnimationFrame(()=>lt.classList.add("animate"));
-  setTimeout(async()=>{window.spread=prevSpread;lt.style.display="none";await draw();busy=false},820);
-}
-async function setZoom(d){
-  if(busy)return;
-  scale=Math.max(.65,Math.min(2.2,scale+d));await draw();
-}
-prev.onclick=prevPage;next.onclick=nextPage;
-$("plus").onclick=()=>setZoom(.15);$("minus").onclick=()=>setZoom(-.15);
-zoom.onclick=()=>{scale=1;draw()};
-$("full").onclick=async()=>{if(!document.fullscreenElement)await document.documentElement.requestFullscreen?.();else await document.exitFullscreen?.()};
-book.addEventListener("click",e=>{
-  if(busy)return;
-  const r=book.getBoundingClientRect(),x=e.clientX-r.left;
-  if(state==="cover" && x>r.width*.5)nextPage();
-  else if(state==="back" && x<r.width*.5)prevPage();
-  else if(state==="spread" && x>r.width*.56)nextPage();
-  else if(state==="spread" && x<r.width*.44)prevPage();
-});
-document.addEventListener("keydown",e=>{
-  if(e.key==="ArrowRight"||e.key==="PageDown")nextPage();
-  if(e.key==="ArrowLeft"||e.key==="PageUp")prevPage();
-  if(e.key==="+")setZoom(.15);if(e.key==="-")setZoom(-.15);
-  if(e.key==="0"){scale=1;draw()}if(e.key==="f")$("full").click();
-});
-window.addEventListener("resize",fit);
 
-pdf=await pdfjsLib.getDocument({url:FILE}).promise;
-await draw();
+function update(index){
+  // page-flip index is zero based. In cover mode, the first and last pages
+  // are shown alone; interior pages are naturally displayed as spreads.
+  if(index===0)info.textContent="Cover";
+  else if(index===total-1)info.textContent="Back cover";
+  else{
+    const a=index+1;
+    const b=Math.min(index+2,total-1);
+    info.textContent=`${a}–${b} / ${total}`;
+  }
+  const atStart=index===0,atEnd=index===total-1;
+  prev.disabled=atStart;prevEdge.classList.toggle("disabled",atStart);
+  next.disabled=atEnd;nextEdge.classList.toggle("disabled",atEnd);
+}
+
+function applyZoom(){
+  book.style.transform=`scale(${zoom})`;
+  zoomLabel.textContent=Math.round(zoom*100)+"%";
+}
+
+function doNext(){if(pageFlip)pageFlip.flipNext("bottom")}
+function doPrev(){if(pageFlip)pageFlip.flipPrev("bottom")}
+
+prev.onclick=doPrev;prevEdge.onclick=doPrev;
+next.onclick=doNext;nextEdge.onclick=doNext;
+zoomIn.onclick=()=>{zoom=Math.min(1.5,zoom+.1);applyZoom()};
+zoomOut.onclick=()=>{zoom=Math.max(.8,zoom-.1);applyZoom()};
+zoomLabel.onclick=()=>{zoom=1;applyZoom()};
+full.onclick=async()=>{
+  if(!document.fullscreenElement)await document.documentElement.requestFullscreen?.();
+  else await document.exitFullscreen?.();
+};
+
+document.addEventListener("keydown",e=>{
+  if(e.key==="ArrowRight"||e.key==="PageDown")doNext();
+  if(e.key==="ArrowLeft"||e.key==="PageUp")doPrev();
+  if(e.key==="+"){zoom=Math.min(1.5,zoom+.1);applyZoom()}
+  if(e.key==="-"){zoom=Math.max(.8,zoom-.1);applyZoom()}
+  if(e.key==="0"){zoom=1;applyZoom()}
+  if(e.key.toLowerCase()==="f")full.click();
+});
+
+try{
+  pdf=await pdfjsLib.getDocument({url:PDF_FILE}).promise;
+  total=pdf.numPages;
+  setLoad(`Preparing ${total} pages…`);
+
+  for(let i=1;i<=total;i++){
+    setLoad(`Preparing page ${i} of ${total}…`);
+    images.push(await render(i));
+  }
+
+  images.forEach((src,i)=>createPage(src,i));
+
+  const PageFlip=window.St.PageFlip;
+  if(!PageFlip)throw new Error("Page flip library unavailable");
+
+  const aspect=await pdf.getPage(1).then(p=>p.getViewport({scale:1}));
+  pageFlip=new PageFlip(book,{
+    width:aspect.width,
+    height:aspect.height,
+    size:"stretch",
+    minWidth:280,
+    maxWidth:900,
+    minHeight:396,
+    maxHeight:1273,
+    drawShadow:true,
+    maxShadowOpacity:.42,
+    flippingTime:780,
+    usePortrait:true,
+    showCover:true,
+    startPage:0,
+    autoSize:true,
+    mobileScrollSupport:false,
+    swipeDistance:35,
+    useMouseEvents:true,
+    disableFlipByClick:false
+  });
+
+  pageFlip.loadFromHtml(book.querySelectorAll(".page"));
+  pageFlip.on("flip",e=>update(e.data));
+  pageFlip.on("changeOrientation",()=>update(pageFlip.getCurrentPageIndex()));
+  update(0);
+
+  loader.style.opacity="0";
+  setTimeout(()=>loader.style.display="none",320);
+}catch(err){
+  console.error(err);
+  setLoad("Unable to open the annual report.");
+  document.querySelector(".spinner").style.display="none";
+}
 </script>
 </body>
 </html>
