@@ -44,29 +44,7 @@ body{
   user-select:none;
   -webkit-user-drag:none;
 }
-#book.spread:after{
-  content:"";
-  position:absolute;
-  top:0;bottom:0;left:50%;
-  width:38px;
-  transform:translateX(-50%);
-  pointer-events:none;
 
-  /*
-    IMPORTANT:
-    The gutter is BELOW the page surfaces, not above them.
-    Therefore the turning page naturally covers it as it
-    crosses the spine. There is no hide/show animation.
-  */
-  z-index:0;
-
-  background:linear-gradient(90deg,
-    transparent 0%,
-    rgba(0,0,0,.035) 20%,
-    rgba(0,0,0,.16) 50%,
-    rgba(0,0,0,.035) 80%,
-    transparent 100%);
-}
 .nav{
   position:fixed;top:50%;
   transform:translateY(-50%);
@@ -256,7 +234,6 @@ body{
     next.disabled = last;
     nextEdge.disabled = last;
 
-    book.classList.toggle("spread",index > 0 && index < total-1);
   }
 
   function goNext(){
