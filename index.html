@@ -2,1590 +2,2024 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Akhand Jyoti — Annual Report 2025–26</title>
 
+<!-- PDF.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<!-- StPageFlip -->
 <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
 
 <style>
-*{box-sizing:border-box}
 
-html,body{
-  margin:0;
-  width:100%;
-  height:100%;
-  overflow:hidden;
+/* =========================================================
+   BASIC RESET
+========================================================= */
+
+*{
+    box-sizing:border-box;
+}
+
+html,
+body{
+    width:100%;
+    height:100%;
+    margin:0;
+    padding:0;
+    overflow:hidden;
 }
 
 body{
-  background:radial-gradient(
-    ellipse at center,
-    #414141 0%,
-    #292929 38%,
-    #151515 78%,
-    #0d0d0d 100%
-  );
-  color:#fff;
-  font-family:Arial,Helvetica,sans-serif;
+    background:
+        radial-gradient(
+            ellipse at center,
+            #424242 0%,
+            #303030 35%,
+            #1d1d1d 68%,
+            #111111 100%
+        );
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    color:#fff;
 }
+
+
+/* =========================================================
+   MAIN READER
+========================================================= */
 
 #reader{
-  position:fixed;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+    position:fixed;
+    inset:0;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 
-#stage{
-  position:relative;
-  width:min(94vw,1240px);
-  height:min(86vh,900px);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  perspective:1800px;
+
+/*
+   This is the actual book area.
+
+   The book is always centered.
+*/
+
+#bookStage{
+    position:relative;
+
+    width:min(92vw,1280px);
+    height:min(84vh,900px);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    transform-origin:center center;
+
+    transition:
+        transform .2s ease;
 }
 
-#book{
-  position:relative;
-  width:100%;
-  height:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
 
-/* ================= INTERIOR BOOK ================= */
+/* =========================================================
+   FLIPBOOK CONTAINER
+========================================================= */
 
 #flipbook{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  opacity:0;
-  visibility:hidden;
-  transition:opacity .12s ease;
+    position:relative;
+
+    width:100%;
+    height:100%;
+
+    margin:0;
+    padding:0;
+
+    visibility:hidden;
+    opacity:0;
+
+    transition:
+        opacity .25s ease;
 }
 
 #flipbook.ready{
-  visibility:visible;
+    visibility:visible;
 }
 
 #flipbook.visible{
-  opacity:1;
+    opacity:1;
 }
 
+
+/* =========================================================
+   PDF PAGES
+========================================================= */
+
 .page{
-  background:#fff;
-  overflow:hidden;
+    background:#fff;
+
+    overflow:hidden;
+
+    /*
+       Important:
+       first and last pages become hard covers.
+    */
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.16);
 }
 
 .page img{
-  display:block;
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  background:#fff;
-  user-select:none;
-  -webkit-user-drag:none;
+    display:block;
+
+    width:100%;
+    height:100%;
+
+    object-fit:contain;
+
+    background:#fff;
+
+    user-select:none;
+    -webkit-user-drag:none;
 }
 
-/* ================= FRONT COVER ================= */
 
-#frontCover{
-  position:absolute;
-  z-index:50;
+/* =========================================================
+   CENTER SPINE SHADOW
+========================================================= */
 
-  top:50%;
-  left:25%;
+/*
+   This gives the open magazine a subtle permanent
+   binding shadow in the center.
+*/
 
-  width:50%;
-  height:100%;
+#spineShadow{
+    position:absolute;
 
-  transform:translate(0,-50%);
+    z-index:100;
 
-  transform-origin:left center;
-  transform-style:preserve-3d;
+    left:50%;
+    top:0;
 
-  cursor:pointer;
+    width:34px;
+    height:100%;
 
-  box-shadow:
-    0 22px 45px rgba(0,0,0,.48),
-    7px 0 15px rgba(0,0,0,.22);
+    transform:translateX(-50%);
 
-  transition:
-    transform .82s cubic-bezier(.22,.72,.18,1),
-    box-shadow .82s ease,
-    opacity .08s linear .72s;
+    pointer-events:none;
 
-  backface-visibility:hidden;
+    opacity:0;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(0,0,0,0) 0%,
+            rgba(0,0,0,.025) 15%,
+            rgba(0,0,0,.10) 32%,
+            rgba(0,0,0,.20) 46%,
+            rgba(0,0,0,.25) 50%,
+            rgba(0,0,0,.20) 54%,
+            rgba(0,0,0,.10) 68%,
+            rgba(0,0,0,.025) 85%,
+            rgba(0,0,0,0) 100%
+        );
+
+    transition:
+        opacity .25s ease;
 }
 
-#frontCover img{
-  display:block;
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  background:#fff;
-  user-select:none;
-  -webkit-user-drag:none;
-  backface-visibility:hidden;
+#spineShadow.visible{
+    opacity:1;
 }
 
-#frontCover::before{
-  content:"";
-  position:absolute;
-  z-index:3;
-  left:0;
-  top:0;
-  bottom:0;
-  width:30px;
 
-  background:linear-gradient(
-    90deg,
-    rgba(0,0,0,.30),
-    rgba(0,0,0,.10),
-    transparent
-  );
+/*
+   Very thin actual crease.
+*/
 
-  pointer-events:none;
+#spineShadow::after{
+    content:"";
+
+    position:absolute;
+
+    left:50%;
+    top:0;
+
+    width:1px;
+    height:100%;
+
+    transform:translateX(-50%);
+
+    background:
+        rgba(0,0,0,.16);
 }
 
-#frontCover::after{
-  content:"";
-  position:absolute;
-  z-index:4;
-  top:0;
-  bottom:0;
-  right:0;
-  width:30px;
 
-  background:linear-gradient(
-    90deg,
-    transparent,
-    rgba(0,0,0,.17)
-  );
-
-  pointer-events:none;
-}
-
-#frontCover.opening{
-  transform:
-    translate(50%,-50%)
-    rotateY(-180deg);
-
-  box-shadow:
-    -12px 22px 45px rgba(0,0,0,.25);
-
-  pointer-events:none;
-}
-
-#frontCover.opened{
-  opacity:0;
-  visibility:hidden;
-  pointer-events:none;
-}
-
-/* ================= CENTRAL SPINE ================= */
-
-#gutter{
-  position:absolute;
-  z-index:30;
-
-  top:50%;
-  left:50%;
-
-  width:38px;
-  height:100%;
-
-  transform:translate(-50%,-50%);
-
-  pointer-events:none;
-  opacity:0;
-
-  background:linear-gradient(
-    90deg,
-    rgba(0,0,0,0) 0%,
-    rgba(0,0,0,.035) 10%,
-    rgba(0,0,0,.11) 25%,
-    rgba(0,0,0,.25) 40%,
-    rgba(0,0,0,.35) 50%,
-    rgba(0,0,0,.25) 60%,
-    rgba(0,0,0,.11) 75%,
-    rgba(0,0,0,.035) 90%,
-    rgba(0,0,0,0) 100%
-  );
-
-  transition:opacity .18s ease;
-}
-
-#gutter::after{
-  content:"";
-  position:absolute;
-  top:0;
-  bottom:0;
-  left:50%;
-  width:1px;
-  transform:translateX(-50%);
-  background:rgba(0,0,0,.18);
-}
-
-#gutter.visible{
-  opacity:1;
-}
-
-#gutter.turning{
-  opacity:0;
-}
-
-/* ================= TITLE ================= */
+/* =========================================================
+   TOP TITLE
+========================================================= */
 
 #title{
-  position:fixed;
-  z-index:500;
+    position:fixed;
 
-  top:11px;
-  left:50%;
+    z-index:500;
 
-  transform:translateX(-50%);
+    top:10px;
+    left:50%;
 
-  font-size:13px;
-  font-weight:600;
-  color:rgba(255,255,255,.76);
+    transform:translateX(-50%);
 
-  white-space:nowrap;
-  pointer-events:none;
+    color:rgba(255,255,255,.72);
+
+    font-size:13px;
+    font-weight:600;
+
+    letter-spacing:.1px;
+
+    white-space:nowrap;
+
+    pointer-events:none;
 }
 
-/* ================= LARGE NAVIGATION ================= */
 
-.edge{
-  position:fixed;
-  z-index:700;
+/* =========================================================
+   LARGE PREVIOUS / NEXT BUTTONS
+========================================================= */
 
-  top:50%;
-  transform:translateY(-50%);
+.navButton{
+    position:fixed;
 
-  width:62px;
-  height:118px;
+    z-index:900;
 
-  border:0;
-  border-radius:14px;
+    top:50%;
 
-  background:rgba(18,18,18,.80);
-  color:#fff;
+    width:64px;
+    height:116px;
 
-  box-shadow:0 8px 25px rgba(0,0,0,.38);
-  backdrop-filter:blur(8px);
+    transform:translateY(-50%);
 
-  cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
+    border:1px solid rgba(255,255,255,.13);
 
-  transition:
-    background .18s,
-    opacity .18s,
-    transform .18s;
+    border-radius:14px;
+
+    background:
+        rgba(20,20,20,.82);
+
+    color:#fff;
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.42);
+
+    backdrop-filter:blur(8px);
+
+    cursor:pointer;
+
+    transition:
+        background .18s ease,
+        opacity .18s ease,
+        transform .18s ease;
 }
 
-.edge:hover{
-  background:rgba(48,48,48,.95);
+.navButton:hover{
+    background:
+        rgba(52,52,52,.94);
 }
 
-.edge:active{
-  transform:translateY(-50%) scale(.95);
+.navButton:active{
+    transform:
+        translateY(-50%)
+        scale(.94);
 }
 
-.edge span{
-  font-size:58px;
-  font-weight:200;
-  line-height:1;
+.navButton span{
+    font-size:60px;
+    font-weight:200;
+    line-height:1;
+
+    margin-top:-5px;
 }
 
-#prevEdge{
-  left:16px;
+#previousButton{
+    left:15px;
 }
 
-#nextEdge{
-  right:16px;
+#nextButton{
+    right:15px;
 }
 
-.edge.disabled{
-  opacity:.18;
-  pointer-events:none;
+.navButton.disabled{
+    opacity:.20;
+    pointer-events:none;
 }
 
-/* ================= BOTTOM CONTROLS ================= */
+
+/* =========================================================
+   BOTTOM CONTROL BAR
+========================================================= */
 
 #controls{
-  position:fixed;
-  z-index:800;
+    position:fixed;
 
-  bottom:14px;
-  left:50%;
+    z-index:1000;
 
-  transform:translateX(-50%);
+    left:50%;
+    bottom:13px;
 
-  display:flex;
-  align-items:center;
-  gap:6px;
+    transform:translateX(-50%);
 
-  padding:7px 9px;
+    display:flex;
+    align-items:center;
 
-  border-radius:12px;
+    gap:6px;
 
-  background:rgba(24,24,24,.91);
-  border:1px solid rgba(255,255,255,.14);
+    padding:7px 9px;
 
-  box-shadow:0 10px 30px rgba(0,0,0,.42);
-  backdrop-filter:blur(12px);
+    border-radius:11px;
+
+    background:
+        rgba(25,25,25,.92);
+
+    border:
+        1px solid rgba(255,255,255,.14);
+
+    box-shadow:
+        0 9px 28px rgba(0,0,0,.42);
+
+    backdrop-filter:blur(12px);
 }
 
-.ctrl{
-  width:38px;
-  height:35px;
+.control{
+    width:38px;
+    height:34px;
 
-  border:1px solid rgba(255,255,255,.13);
-  border-radius:7px;
+    padding:0;
 
-  background:#303030;
-  color:#fff;
+    border:
+        1px solid rgba(255,255,255,.12);
 
-  cursor:pointer;
-  font-size:17px;
+    border-radius:7px;
+
+    background:#303030;
+
+    color:#fff;
+
+    cursor:pointer;
+
+    font-size:17px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 
-.ctrl:hover{
-  background:#414141;
+.control:hover{
+    background:#414141;
 }
 
-.ctrl:disabled{
-  opacity:.35;
-  cursor:not-allowed;
+.control:disabled{
+    opacity:.35;
+    cursor:not-allowed;
 }
 
-#info{
-  min-width:96px;
-  text-align:center;
-  font-size:12px;
-  color:#ddd;
-  font-variant-numeric:tabular-nums;
+#pageInfo{
+    min-width:105px;
+
+    text-align:center;
+
+    color:#ddd;
+
+    font-size:12px;
+
+    font-variant-numeric:
+        tabular-nums;
 }
 
-#zoomLabel{
-  width:48px;
-  font-size:11px;
+#zoomReset{
+    width:48px;
+
+    font-size:11px;
 }
+
+
+/* =========================================================
+   HINT
+========================================================= */
 
 #hint{
-  position:fixed;
-  z-index:500;
-  right:16px;
-  bottom:20px;
-  color:rgba(255,255,255,.38);
-  font-size:11px;
+    position:fixed;
+
+    right:15px;
+    bottom:20px;
+
+    z-index:500;
+
+    color:
+        rgba(255,255,255,.34);
+
+    font-size:11px;
+
+    pointer-events:none;
 }
 
-/* ================= LOADING ================= */
+
+/* =========================================================
+   LOADING SCREEN
+========================================================= */
 
 #loading{
-  position:fixed;
-  inset:0;
-  z-index:1000;
+    position:fixed;
 
-  background:#151515;
+    inset:0;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
+    z-index:2000;
 
-  transition:opacity .3s;
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    background:#151515;
+
+    transition:
+        opacity .35s ease;
 }
 
 .loader{
-  text-align:center;
-  color:#ddd;
-  font-size:13px;
+    text-align:center;
+
+    color:#ddd;
+
+    font-size:13px;
 }
 
 .spinner{
-  width:34px;
-  height:34px;
+    width:34px;
+    height:34px;
 
-  margin:0 auto 14px;
+    margin:0 auto 14px;
 
-  border-radius:50%;
+    border-radius:50%;
 
-  border:3px solid rgba(255,255,255,.18);
-  border-top-color:#fff;
+    border:
+        3px solid
+        rgba(255,255,255,.17);
 
-  animation:spin .8s linear infinite;
+    border-top-color:#fff;
+
+    animation:
+        spin .8s linear infinite;
 }
 
 @keyframes spin{
-  to{transform:rotate(360deg)}
+
+    to{
+        transform:rotate(360deg);
+    }
+
 }
 
-/* ================= ERROR ================= */
+
+/* =========================================================
+   ERROR
+========================================================= */
 
 #error{
-  display:none;
+    position:fixed;
 
-  position:fixed;
-  inset:0;
-  z-index:1100;
+    inset:0;
 
-  align-items:center;
-  justify-content:center;
+    z-index:3000;
 
-  background:#151515;
-  color:#ccc;
+    display:none;
 
-  text-align:center;
-  padding:30px;
+    align-items:center;
+    justify-content:center;
+
+    background:#151515;
+
+    color:#ccc;
+
+    text-align:center;
+
+    padding:30px;
 }
 
-#error h3{
-  color:#fff;
+#error h2{
+    color:#fff;
+
+    margin-bottom:10px;
 }
 
-/* ================= RESPONSIVE ================= */
+#error p{
+    max-width:600px;
+
+    line-height:1.6;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
 
 @media(max-width:850px){
 
-  #stage{
-    width:100vw;
-    height:82vh;
-  }
+    #bookStage{
+        width:94vw;
+        height:78vh;
+    }
 
-  #frontCover{
-    width:50%;
-    height:100%;
-  }
+    .navButton{
+        width:48px;
+        height:88px;
+    }
 
-  #gutter{
-    height:100%;
-  }
+    .navButton span{
+        font-size:44px;
+    }
 
-  .edge{
-    width:48px;
-    height:92px;
-  }
+    #previousButton{
+        left:4px;
+    }
 
-  .edge span{
-    font-size:44px;
-  }
+    #nextButton{
+        right:4px;
+    }
 
-  #prevEdge{
-    left:5px;
-  }
+    #hint{
+        display:none;
+    }
 
-  #nextEdge{
-    right:5px;
-  }
-
-  #hint{
-    display:none;
-  }
 }
+
+
+/* =========================================================
+   VERY SMALL SCREENS
+========================================================= */
 
 @media(max-width:520px){
 
-  #controls{
-    bottom:7px;
-  }
+    #title{
+        font-size:11px;
+        max-width:90vw;
 
-  .ctrl{
-    width:34px;
-    height:33px;
-  }
+        overflow:hidden;
+        text-overflow:ellipsis;
+    }
 
-  #info{
-    min-width:76px;
-  }
+    #controls{
+        bottom:6px;
+    }
 
-  #title{
-    font-size:11px;
-    max-width:88%;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
+    .control{
+        width:34px;
+        height:32px;
+    }
+
+    #pageInfo{
+        min-width:72px;
+        font-size:11px;
+    }
+
+    #zoomReset{
+        width:44px;
+    }
+
 }
+
 </style>
 </head>
 
+
 <body>
+
+
+<!-- ======================================================
+     READER
+======================================================= -->
 
 <div id="reader">
 
-  <div id="stage">
+    <div id="bookStage">
 
-    <div id="book">
+        <!--
+             ALL PDF PAGES ARE INSIDE THIS.
 
-      <!-- Interior pages are prepared underneath the cover -->
-      <div id="flipbook"></div>
+             PageFlip itself handles:
+             - front cover
+             - inside pages
+             - back cover
+             - page turning
+             - shadows
+             - spine
+        -->
 
-      <!-- Dedicated physical front cover -->
-      <div id="frontCover">
+        <div id="flipbook"></div>
 
-        <img
-          id="coverImage"
-          alt="Akhand Jyoti Annual Report cover"
-        >
-
-      </div>
-
-      <!-- Physical magazine spine -->
-      <div id="gutter"></div>
+        <!-- Permanent center binding shadow -->
+        <div id="spineShadow"></div>
 
     </div>
 
-  </div>
-
 </div>
+
+
+<!-- ======================================================
+     TITLE
+======================================================= -->
 
 <div id="title">
-  Akhand Jyoti — Annual Report 2025–26
+    Akhand Jyoti — Annual Report 2025–26
 </div>
 
-<!-- Prominent navigation -->
+
+<!-- ======================================================
+     LARGE NAVIGATION
+======================================================= -->
 
 <button
-  id="prevEdge"
-  class="edge disabled"
-  aria-label="Previous page"
-  title="Previous page"
+    id="previousButton"
+    class="navButton disabled"
+    aria-label="Previous page"
+    title="Previous page"
 >
-  <span>‹</span>
+    <span>‹</span>
 </button>
+
 
 <button
-  id="nextEdge"
-  class="edge"
-  aria-label="Next page"
-  title="Next page"
+    id="nextButton"
+    class="navButton"
+    aria-label="Next page"
+    title="Next page"
 >
-  <span>›</span>
+    <span>›</span>
 </button>
 
-<!-- Bottom controls -->
+
+<!-- ======================================================
+     BOTTOM CONTROLS
+======================================================= -->
 
 <div id="controls">
 
-  <button
-    id="prev"
-    class="ctrl"
-    title="Previous page"
-  >‹</button>
+    <button
+        id="previousControl"
+        class="control"
+        title="Previous page"
+        aria-label="Previous page"
+    >
+        ‹
+    </button>
 
-  <div id="info">Cover</div>
 
-  <button
-    id="next"
-    class="ctrl"
-    title="Next page"
-  >›</button>
+    <div id="pageInfo">
+        Cover
+    </div>
 
-  <button
-    id="zoomOut"
-    class="ctrl"
-    title="Zoom out"
-  >−</button>
 
-  <button
-    id="zoomLabel"
-    class="ctrl"
-    title="Reset zoom"
-  >100%</button>
+    <button
+        id="nextControl"
+        class="control"
+        title="Next page"
+        aria-label="Next page"
+    >
+        ›
+    </button>
 
-  <button
-    id="zoomIn"
-    class="ctrl"
-    title="Zoom in"
-  >+</button>
 
-  <button
-    id="full"
-    class="ctrl"
-    title="Fullscreen"
-  >⛶</button>
+    <button
+        id="zoomOut"
+        class="control"
+        title="Zoom out"
+        aria-label="Zoom out"
+    >
+        −
+    </button>
+
+
+    <button
+        id="zoomReset"
+        class="control"
+        title="Reset zoom"
+        aria-label="Reset zoom"
+    >
+        100%
+    </button>
+
+
+    <button
+        id="zoomIn"
+        class="control"
+        title="Zoom in"
+        aria-label="Zoom in"
+    >
+        +
+    </button>
+
+
+    <button
+        id="fullscreen"
+        class="control"
+        title="Fullscreen"
+        aria-label="Fullscreen"
+    >
+        ⛶
+    </button>
 
 </div>
+
 
 <div id="hint">
-  Drag the page corner or use the arrows
+    Drag a page corner or use the arrows
 </div>
+
+
+<!-- ======================================================
+     LOADING
+======================================================= -->
 
 <div id="loading">
 
-  <div class="loader">
+    <div class="loader">
 
-    <div class="spinner"></div>
+        <div class="spinner"></div>
 
-    <div id="loadingText">
-      Opening annual report…
+        <div id="loadingText">
+            Opening annual report…
+        </div>
+
     </div>
 
-  </div>
-
 </div>
+
+
+<!-- ======================================================
+     ERROR
+======================================================= -->
 
 <div id="error">
 
-  <div>
+    <div>
 
-    <h3>Unable to open the annual report</h3>
+        <h2>
+            Unable to open the annual report
+        </h2>
 
-    <p id="errorText"></p>
+        <p id="errorText"></p>
 
-  </div>
+    </div>
 
 </div>
 
+
+
 <script>
 
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+/* =========================================================
+   PDF.JS WORKER
+========================================================= */
 
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+
+/* =========================================================
+   IMPORTANT
+   Keep the PDF in the SAME GitHub repository folder
+   as this index.html.
+========================================================= */
 
 const PDF_FILE =
-  "Annual%20report%2025-26_V2.pdf";
-
-const COVER_PAGE = 1;
-const FIRST_INTERIOR = 2;
+    "Annual report 25-26_V2.pdf";
 
 
-const stage =
-  document.getElementById("stage");
+/* =========================================================
+   DOM
+========================================================= */
+
+const bookStage =
+    document.getElementById("bookStage");
 
 const flipbook =
-  document.getElementById("flipbook");
+    document.getElementById("flipbook");
 
-const frontCover =
-  document.getElementById("frontCover");
-
-const coverImage =
-  document.getElementById("coverImage");
-
-const gutter =
-  document.getElementById("gutter");
+const spineShadow =
+    document.getElementById("spineShadow");
 
 const loading =
-  document.getElementById("loading");
+    document.getElementById("loading");
 
 const loadingText =
-  document.getElementById("loadingText");
+    document.getElementById("loadingText");
 
 const errorBox =
-  document.getElementById("error");
+    document.getElementById("error");
 
 const errorText =
-  document.getElementById("errorText");
+    document.getElementById("errorText");
 
-const info =
-  document.getElementById("info");
+const pageInfo =
+    document.getElementById("pageInfo");
 
-const prev =
-  document.getElementById("prev");
+const previousButton =
+    document.getElementById("previousButton");
 
-const next =
-  document.getElementById("next");
+const nextButton =
+    document.getElementById("nextButton");
 
-const prevEdge =
-  document.getElementById("prevEdge");
+const previousControl =
+    document.getElementById("previousControl");
 
-const nextEdge =
-  document.getElementById("nextEdge");
+const nextControl =
+    document.getElementById("nextControl");
 
 const zoomIn =
-  document.getElementById("zoomIn");
+    document.getElementById("zoomIn");
 
 const zoomOut =
-  document.getElementById("zoomOut");
+    document.getElementById("zoomOut");
 
-const zoomLabel =
-  document.getElementById("zoomLabel");
+const zoomReset =
+    document.getElementById("zoomReset");
 
-const full =
-  document.getElementById("full");
+const fullscreen =
+    document.getElementById("fullscreen");
 
+
+/* =========================================================
+   VARIABLES
+========================================================= */
 
 let pdf = null;
-let flip = null;
+
+let pageFlip = null;
+
 let totalPages = 0;
-let zoom = 1;
-let coverOpened = false;
-let interiorPageCount = 0;
+
+let zoom =
+    1;
 
 
-/* ================= HELPERS ================= */
+/* =========================================================
+   LOADING
+========================================================= */
 
-function setLoading(text){
-  loadingText.textContent = text;
+function setLoading(message){
+
+    loadingText.textContent =
+        message;
+
 }
 
+
+/* =========================================================
+   ERROR
+========================================================= */
 
 function showError(message){
-  loading.style.display = "none";
-  errorText.textContent = message;
-  errorBox.style.display = "flex";
+
+    loading.style.display =
+        "none";
+
+    errorText.textContent =
+        message;
+
+    errorBox.style.display =
+        "flex";
+
 }
 
 
-/* ================= PDF RENDER ================= */
+/* =========================================================
+   RENDER ONE PDF PAGE
+========================================================= */
 
-async function renderPage(pageNumber,scale){
-
-  const page =
-    await pdf.getPage(pageNumber);
-
-  const viewport =
-    page.getViewport({
-      scale:scale
-    });
-
-  const canvas =
-    document.createElement("canvas");
-
-  const ctx =
-    canvas.getContext(
-      "2d",
-      {alpha:false}
-    );
-
-  canvas.width =
-    Math.ceil(viewport.width);
-
-  canvas.height =
-    Math.ceil(viewport.height);
-
-  await page.render({
-    canvasContext:ctx,
-    viewport:viewport
-  }).promise;
-
-  return canvas.toDataURL(
-    "image/jpeg",
-    .90
-  );
-}
-
-
-function makePage(dataUrl,pdfPageNumber){
-
-  const div =
-    document.createElement("div");
-
-  div.className = "page";
-
-  const img =
-    document.createElement("img");
-
-  img.src = dataUrl;
-
-  img.alt =
-    "Annual Report page " +
-    pdfPageNumber;
-
-  div.appendChild(img);
-
-  flipbook.appendChild(div);
-}
-
-
-/* ================= CENTER GEOMETRY ================= */
-
-function setCenterGeometry(
-  pageWidth,
-  pageHeight
+async function renderPDFPage(
+    pageNumber,
+    scale
 ){
 
-  const maxBookW =
-    Math.min(
-      window.innerWidth * .94,
-      1240
+    const page =
+        await pdf.getPage(
+            pageNumber
+        );
+
+
+    const viewport =
+        page.getViewport({
+            scale:scale
+        });
+
+
+    const canvas =
+        document.createElement(
+            "canvas"
+        );
+
+
+    const context =
+        canvas.getContext(
+            "2d",
+            {
+                alpha:false
+            }
+        );
+
+
+    canvas.width =
+        Math.ceil(
+            viewport.width
+        );
+
+
+    canvas.height =
+        Math.ceil(
+            viewport.height
+        );
+
+
+    await page.render({
+
+        canvasContext:
+            context,
+
+        viewport:
+            viewport
+
+    }).promise;
+
+
+    return canvas.toDataURL(
+        "image/jpeg",
+        .92
     );
 
-  const maxBookH =
-    Math.min(
-      window.innerHeight * .86,
-      900
-    );
-
-  const aspect =
-    pageWidth / pageHeight;
-
-  let h =
-    maxBookH;
-
-  let w =
-    h * aspect * 2;
-
-  if(w > maxBookW){
-
-    w =
-      maxBookW;
-
-    h =
-      w / (aspect * 2);
-
-  }
-
-  stage.style.width =
-    w + "px";
-
-  stage.style.height =
-    h + "px";
-
-  /*
-    One page is exactly half the open-book width.
-    Closed cover is centered in the viewport.
-  */
-
-  frontCover.style.width =
-    (w / 2) + "px";
-
-  frontCover.style.height =
-    h + "px";
-
-  gutter.style.height =
-    h + "px";
 }
 
 
-/* ================= NAVIGATION DISPLAY ================= */
+/* =========================================================
+   CREATE PAGE
+========================================================= */
 
-function updateNavigation(index){
+function createPage(
+    imageURL,
+    pageNumber
+){
 
-  if(!coverOpened){
+    const page =
+        document.createElement(
+            "div"
+        );
 
-    info.textContent =
-      "Cover";
 
-    prev.disabled =
-      true;
+    page.className =
+        "page";
 
-    prevEdge.classList.add(
-      "disabled"
-    );
 
-    next.disabled =
-      false;
+    /*
+       HARD pages are used for:
+       - first page = front cover
+       - last page = back cover
 
-    nextEdge.classList.remove(
-      "disabled"
-    );
+       Soft pages are used for all interior pages.
+    */
 
-    gutter.classList.remove(
-      "visible"
-    );
+    if(
+        pageNumber === 1 ||
+        pageNumber === totalPages
+    ){
 
-    return;
-  }
-
-
-  const firstPdfPage =
-    FIRST_INTERIOR + index;
-
-
-  if(firstPdfPage >= totalPages){
-
-    info.textContent =
-      "Back cover";
-
-  }else{
-
-    const secondPdfPage =
-      Math.min(
-        firstPdfPage + 1,
-        totalPages
-      );
-
-    info.textContent =
-      firstPdfPage +
-      "–" +
-      secondPdfPage +
-      " / " +
-      totalPages;
-  }
-
-
-  const atStart =
-    index <= 0;
-
-  const atEnd =
-    index >= interiorPageCount - 1;
-
-
-  prev.disabled =
-    false;
-
-  /*
-    At the first interior spread, Previous MUST remain
-    active because it returns to the front cover.
-  */
-  prevEdge.classList.remove(
-    "disabled"
-  );
-
-
-  if(atEnd){
-
-    next.disabled = true;
-
-    nextEdge.classList.add(
-      "disabled"
-    );
-
-  }else{
-
-    next.disabled = false;
-
-    nextEdge.classList.remove(
-      "disabled"
-    );
-
-  }
-
-
-  if(!atStart && !atEnd){
-
-    gutter.classList.add(
-      "visible"
-    );
-
-  }else{
-
-    gutter.classList.remove(
-      "visible"
-    );
-
-  }
-}
-
-
-/* ================= OPEN COVER ================= */
-
-function openCover(){
-
-  if(coverOpened)
-    return;
-
-  coverOpened = true;
-
-  gutter.classList.add(
-    "turning"
-  );
-
-  frontCover.classList.remove(
-    "opened"
-  );
-
-  frontCover.classList.add(
-    "opening"
-  );
-
-
-  /*
-    The complete first interior spread already exists
-    underneath the cover.
-  */
-
-  setTimeout(function(){
-
-    flipbook.classList.add(
-      "visible"
-    );
-
-  },170);
-
-
-  setTimeout(function(){
-
-    frontCover.classList.add(
-      "opened"
-    );
-
-    gutter.classList.remove(
-      "turning"
-    );
-
-    updateNavigation(0);
-
-  },840);
-}
-
-
-/* ================= CLOSE COVER ================= */
-
-function closeCover(){
-
-  if(!coverOpened)
-    return;
-
-  gutter.classList.add(
-    "turning"
-  );
-
-  flipbook.classList.remove(
-    "visible"
-  );
-
-  frontCover.classList.remove(
-    "opened"
-  );
-
-  /*
-    Force layout so the reverse animation is not skipped.
-  */
-
-  void frontCover.offsetWidth;
-
-  frontCover.classList.remove(
-    "opening"
-  );
-
-
-  setTimeout(function(){
-
-    coverOpened = false;
-
-    gutter.classList.remove(
-      "turning"
-    );
-
-    updateNavigation(0);
-
-  },840);
-}
-
-
-/* ================= NAVIGATION ================= */
-
-function goNext(){
-
-  if(!coverOpened){
-
-    openCover();
-
-    return;
-  }
-
-  if(flip){
-
-    flip.flipNext(
-      "bottom"
-    );
-  }
-}
-
-
-function goPrev(){
-
-  if(!coverOpened)
-    return;
-
-  /*
-    IMPORTANT:
-    When the interior engine is on its first page,
-    return to the front cover instead of attempting
-    another PageFlip operation.
-  */
-
-  if(
-    flip &&
-    flip.getCurrentPageIndex() > 0
-  ){
-
-    flip.flipPrev(
-      "bottom"
-    );
-
-    return;
-  }
-
-  closeCover();
-}
-
-
-/* Cover click opens it */
-
-frontCover.addEventListener(
-  "click",
-  function(){
-
-    if(!coverOpened)
-      openCover();
-
-  }
-);
-
-
-/* Buttons */
-
-prev.onclick =
-  goPrev;
-
-prevEdge.onclick =
-  goPrev;
-
-next.onclick =
-  goNext;
-
-nextEdge.onclick =
-  goNext;
-
-
-/* ================= ZOOM ================= */
-
-function setZoom(){
-
-  stage.style.transform =
-    "scale(" +
-    zoom +
-    ")";
-
-  zoomLabel.textContent =
-    Math.round(
-      zoom * 100
-    ) + "%";
-}
-
-
-zoomIn.onclick =
-  function(){
-
-    zoom =
-      Math.min(
-        1.5,
-        zoom + .1
-      );
-
-    setZoom();
-
-  };
-
-
-zoomOut.onclick =
-  function(){
-
-    zoom =
-      Math.max(
-        .8,
-        zoom - .1
-      );
-
-    setZoom();
-
-  };
-
-
-zoomLabel.onclick =
-  function(){
-
-    zoom = 1;
-
-    setZoom();
-
-  };
-
-
-/* ================= FULLSCREEN ================= */
-
-full.onclick =
-  async function(){
-
-    if(!document.fullscreenElement){
-
-      await document
-        .documentElement
-        .requestFullscreen?.();
+        page.dataset.density =
+            "hard";
 
     }else{
 
-      await document
-        .exitFullscreen?.();
-
-    }
-
-  };
-
-
-/* ================= KEYBOARD ================= */
-
-document.addEventListener(
-  "keydown",
-  function(e){
-
-    if(
-      e.key === "ArrowRight" ||
-      e.key === "PageDown"
-    ){
-
-      e.preventDefault();
-
-      goNext();
-    }
-
-
-    if(
-      e.key === "ArrowLeft" ||
-      e.key === "PageUp"
-    ){
-
-      e.preventDefault();
-
-      goPrev();
-    }
-
-
-    if(e.key === "+")
-      zoomIn.click();
-
-    if(e.key === "-")
-      zoomOut.click();
-
-    if(e.key === "0")
-      zoomLabel.click();
-
-  }
-);
-
-
-/* ================= RESIZE ================= */
-
-window.addEventListener(
-  "resize",
-  function(){
-
-    if(!pdf || !flip)
-      return;
-
-    setZoom();
-
-  }
-);
-
-
-/* ================= START ================= */
-
-async function start(){
-
-  try{
-
-    setLoading(
-      "Loading PDF…"
-    );
-
-
-    const response =
-      await fetch(
-        PDF_FILE,
-        {
-          cache:"no-store"
-        }
-      );
-
-
-    if(!response.ok){
-
-      throw new Error(
-        "PDF request returned HTTP " +
-        response.status
-      );
+        page.dataset.density =
+            "soft";
 
     }
 
 
-    const buffer =
-      await response.arrayBuffer();
-
-
-    setLoading(
-      "Reading annual report…"
-    );
-
-
-    pdf =
-      await pdfjsLib
-        .getDocument({
-          data:buffer
-        })
-        .promise;
-
-
-    totalPages =
-      pdf.numPages;
-
-
-    if(totalPages < 3){
-
-      throw new Error(
-        "The PDF does not contain enough pages for a magazine."
-      );
-
-    }
-
-
-    const firstPage =
-      await pdf.getPage(
-        COVER_PAGE
-      );
-
-    const baseViewport =
-      firstPage.getViewport({
-        scale:1
-      });
-
-
-    /*
-      Establish the final centered open-book geometry
-      before anything becomes visible.
-    */
-
-    setCenterGeometry(
-      baseViewport.width,
-      baseViewport.height
-    );
-
-
-    /* Render front cover separately */
-
-    setLoading(
-      "Preparing cover…"
-    );
-
-    coverImage.src =
-      await renderPage(
-        COVER_PAGE,
-        1.35
-      );
-
-
-    /*
-      IMPORTANT:
-      Page 1 is NOT part of PageFlip.
-      The interior engine starts at PDF page 2.
-    */
-
-    for(
-      let pdfPage = FIRST_INTERIOR;
-      pdfPage <= totalPages;
-      pdfPage++
-    ){
-
-      setLoading(
-        "Preparing page " +
-        pdfPage +
-        " of " +
-        totalPages +
-        "…"
-      );
-
-      makePage(
-        await renderPage(
-          pdfPage,
-          1.25
-        ),
-        pdfPage
-      );
-
-    }
-
-
-    interiorPageCount =
-      totalPages -
-      FIRST_INTERIOR +
-      1;
-
-
-    if(
-      !window.St ||
-      !window.St.PageFlip
-    ){
-
-      throw new Error(
-        "The page-flip library did not load."
-      );
-
-    }
-
-
-    /*
-      PageFlip controls ONLY the interior pages.
-      The front cover is controlled separately.
-    */
-
-    flip =
-      new St.PageFlip(
-        flipbook,
-        {
-
-          width:
-            baseViewport.width,
-
-          height:
-            baseViewport.height,
-
-          size:
-            "stretch",
-
-          minWidth:
-            280,
-
-          maxWidth:
-            1000,
-
-          minHeight:
-            396,
-
-          maxHeight:
-            1350,
-
-          drawShadow:
-            true,
-
-          maxShadowOpacity:
-            .42,
-
-          flippingTime:
-            780,
-
-          usePortrait:
-            true,
-
-          showCover:
-            false,
-
-          autoSize:
-            true,
-
-          mobileScrollSupport:
-            false,
-
-          swipeDistance:
-            30,
-
-          useMouseEvents:
-            true,
-
-          disableFlipByClick:
-            false,
-
-          startPage:
-            0
-
-        }
-      );
-
-
-    flip.loadFromHTML(
-      flipbook.querySelectorAll(
-        ".page"
-      )
-    );
-
-
-    flip.on(
-      "flip",
-      function(e){
-
-        updateNavigation(
-          e.data
+    const image =
+        document.createElement(
+            "img"
         );
 
-      }
+
+    image.src =
+        imageURL;
+
+
+    image.alt =
+        "Annual Report page " +
+        pageNumber;
+
+
+    image.draggable =
+        false;
+
+
+    page.appendChild(
+        image
     );
 
 
-    flip.on(
-      "changeOrientation",
-      function(){
-
-        updateNavigation(
-          flip.getCurrentPageIndex()
-        );
-
-      }
+    flipbook.appendChild(
+        page
     );
 
-
-    flip.on(
-      "changeState",
-      function(e){
-
-        if(
-          e.data === "flipping"
-        ){
-
-          gutter.classList.add(
-            "turning"
-          );
-
-        }
-
-
-        if(
-          e.data === "read"
-        ){
-
-          updateNavigation(
-            flip.getCurrentPageIndex()
-          );
-
-        }
-
-      }
-    );
-
-
-    flipbook.classList.add(
-      "ready"
-    );
-
-
-    updateNavigation(0);
-
-
-    loading.style.opacity =
-      "0";
-
-
-    setTimeout(
-      function(){
-
-        loading.style.display =
-          "none";
-
-      },
-      350
-    );
-
-
-  }
-  catch(err){
-
-    console.error(err);
-
-    showError(
-      "The viewer could not load the PDF. " +
-      (
-        err &&
-        err.message
-          ? err.message
-          : "Unknown error."
-      )
-    );
-
-  }
 }
 
 
-start();
+/* =========================================================
+   BOOK SIZE
+========================================================= */
+
+function calculateBookSize(
+    pageWidth,
+    pageHeight
+){
+
+    const pageRatio =
+        pageWidth /
+        pageHeight;
+
+
+    /*
+       Desktop book:
+
+       two portrait pages side-by-side.
+
+       Maximum width:
+       92vw
+
+       Maximum height:
+       84vh
+    */
+
+    const maxWidth =
+        Math.min(
+            window.innerWidth * .92,
+            1280
+        );
+
+
+    const maxHeight =
+        Math.min(
+            window.innerHeight * .84,
+            900
+        );
+
+
+    let height =
+        maxHeight;
+
+
+    let width =
+        height *
+        pageRatio *
+        2;
+
+
+    if(width > maxWidth){
+
+        width =
+            maxWidth;
+
+        height =
+            width /
+            (pageRatio * 2);
+
+    }
+
+
+    bookStage.style.width =
+        Math.round(width) +
+        "px";
+
+
+    bookStage.style.height =
+        Math.round(height) +
+        "px";
+
+}
+
+
+/* =========================================================
+   UPDATE NAVIGATION
+========================================================= */
+
+function updateNavigation(){
+
+    if(!pageFlip)
+        return;
+
+
+    const current =
+        pageFlip.getCurrentPageIndex();
+
+
+    const count =
+        pageFlip.getPageCount();
+
+
+    const orientation =
+        pageFlip.getOrientation();
+
+
+    /*
+       FRONT COVER
+    */
+
+    if(current === 0){
+
+        pageInfo.textContent =
+            "Cover";
+
+    }
+
+
+    /*
+       BACK COVER
+    */
+
+    else if(current >= count - 1){
+
+        pageInfo.textContent =
+            "Back cover";
+
+    }
+
+
+    /*
+       INTERIOR
+    */
+
+    else{
+
+        if(
+            orientation ===
+            "landscape"
+        ){
+
+            /*
+               In landscape mode the current page index
+               represents the left page of the spread.
+            */
+
+            const leftPage =
+                current + 1;
+
+
+            const rightPage =
+                Math.min(
+                    current + 2,
+                    totalPages
+                );
+
+
+            pageInfo.textContent =
+                leftPage +
+                "–" +
+                rightPage +
+                " / " +
+                totalPages;
+
+        }else{
+
+            pageInfo.textContent =
+                (current + 1) +
+                " / " +
+                totalPages;
+
+        }
+
+    }
+
+
+    /*
+       PREVIOUS
+
+       The previous button is enabled on the first
+       interior spread so that it can return to the cover.
+    */
+
+    const atBeginning =
+        current === 0;
+
+
+    previousButton.classList.toggle(
+        "disabled",
+        atBeginning
+    );
+
+
+    previousControl.disabled =
+        atBeginning;
+
+
+    /*
+       NEXT
+    */
+
+    const atEnd =
+        current >= count - 1;
+
+
+    nextButton.classList.toggle(
+        "disabled",
+        atEnd
+    );
+
+
+    nextControl.disabled =
+        atEnd;
+
+
+    /*
+       Spine is visible only when an actual open spread
+       is being displayed.
+    */
+
+    const showSpine =
+        orientation === "landscape" &&
+        current > 0 &&
+        current < count - 1;
+
+
+    spineShadow.classList.toggle(
+        "visible",
+        showSpine
+    );
+
+}
+
+
+/* =========================================================
+   NEXT
+========================================================= */
+
+function goNext(){
+
+    if(!pageFlip)
+        return;
+
+
+    if(
+        pageFlip.getCurrentPageIndex() >=
+        pageFlip.getPageCount() - 1
+    ){
+
+        return;
+    }
+
+
+    pageFlip.flipNext(
+        "bottom"
+    );
+
+}
+
+
+/* =========================================================
+   PREVIOUS
+========================================================= */
+
+function goPrevious(){
+
+    if(!pageFlip)
+        return;
+
+
+    if(
+        pageFlip.getCurrentPageIndex() <=
+        0
+    ){
+
+        return;
+    }
+
+
+    /*
+       This is important.
+
+       PageFlip itself contains the front cover.
+       Therefore when the reader is on the FIRST
+       interior spread, flipPrev() naturally returns
+       to the actual front cover.
+
+       There is no separate cover animation and
+       no custom cover-position calculation.
+    */
+
+    pageFlip.flipPrev(
+        "bottom"
+    );
+
+}
+
+
+/* =========================================================
+   BUTTON EVENTS
+========================================================= */
+
+previousButton.onclick =
+    goPrevious;
+
+previousControl.onclick =
+    goPrevious;
+
+nextButton.onclick =
+    goNext;
+
+nextControl.onclick =
+    goNext;
+
+
+/* =========================================================
+   ZOOM
+========================================================= */
+
+function applyZoom(){
+
+    bookStage.style.transform =
+        "scale(" +
+        zoom +
+        ")";
+
+
+    zoomReset.textContent =
+        Math.round(
+            zoom * 100
+        ) +
+        "%";
+
+}
+
+
+/* ZOOM IN */
+
+zoomIn.onclick =
+    function(){
+
+        zoom =
+            Math.min(
+                1.50,
+                zoom + .10
+            );
+
+
+        applyZoom();
+
+    };
+
+
+/* ZOOM OUT */
+
+zoomOut.onclick =
+    function(){
+
+        zoom =
+            Math.max(
+                .80,
+                zoom - .10
+            );
+
+
+        applyZoom();
+
+    };
+
+
+/* RESET */
+
+zoomReset.onclick =
+    function(){
+
+        zoom =
+            1;
+
+
+        applyZoom();
+
+    };
+
+
+/* =========================================================
+   FULLSCREEN
+========================================================= */
+
+fullscreen.onclick =
+    async function(){
+
+        try{
+
+            if(
+                !document.fullscreenElement
+            ){
+
+                await document
+                    .documentElement
+                    .requestFullscreen();
+
+            }else{
+
+                await document
+                    .exitFullscreen();
+
+            }
+
+        }catch(error){
+
+            console.log(
+                "Fullscreen unavailable",
+                error
+            );
+
+        }
+
+    };
+
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    function(event){
+
+        if(
+            event.key ===
+            "ArrowRight"
+        ){
+
+            event.preventDefault();
+
+            goNext();
+
+        }
+
+
+        if(
+            event.key ===
+            "ArrowLeft"
+        ){
+
+            event.preventDefault();
+
+            goPrevious();
+
+        }
+
+
+        if(
+            event.key ===
+            "PageDown"
+        ){
+
+            event.preventDefault();
+
+            goNext();
+
+        }
+
+
+        if(
+            event.key ===
+            "PageUp"
+        ){
+
+            event.preventDefault();
+
+            goPrevious();
+
+        }
+
+
+        if(
+            event.key ===
+            "+"
+        ){
+
+            zoomIn.click();
+
+        }
+
+
+        if(
+            event.key ===
+            "-"
+        ){
+
+            zoomOut.click();
+
+        }
+
+
+        if(
+            event.key ===
+            "0"
+        ){
+
+            zoomReset.click();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   RESIZE
+========================================================= */
+
+window.addEventListener(
+    "resize",
+    function(){
+
+        if(!pageFlip)
+            return;
+
+
+        /*
+           PageFlip's update method recalculates
+           the book after the browser changes size.
+        */
+
+        try{
+
+            pageFlip.update();
+
+        }catch(error){
+
+            console.log(
+                "Resize update:",
+                error
+            );
+
+        }
+
+
+        updateNavigation();
+
+    }
+);
+
+
+/* =========================================================
+   LOAD THE PDF
+========================================================= */
+
+async function startViewer(){
+
+    try{
+
+        setLoading(
+            "Loading annual report…"
+        );
+
+
+        /*
+           Fetch the fixed PDF.
+
+           There is NO upload button and NO file selector.
+        */
+
+        const response =
+            await fetch(
+                PDF_FILE,
+                {
+                    cache:"no-store"
+                }
+            );
+
+
+        if(!response.ok){
+
+            throw new Error(
+                "The PDF returned HTTP " +
+                response.status
+            );
+
+        }
+
+
+        const buffer =
+            await response.arrayBuffer();
+
+
+        setLoading(
+            "Opening annual report…"
+        );
+
+
+        pdf =
+            await pdfjsLib
+                .getDocument({
+                    data:buffer
+                })
+                .promise;
+
+
+        totalPages =
+            pdf.numPages;
+
+
+        if(totalPages < 2){
+
+            throw new Error(
+                "The PDF must contain at least two pages."
+            );
+
+        }
+
+
+        /*
+           Get the real PDF page dimensions.
+
+           This prevents the book from being incorrectly
+           positioned when the cover is opened.
+        */
+
+        const firstPDFPage =
+            await pdf.getPage(1);
+
+
+        const viewport =
+            firstPDFPage.getViewport({
+                scale:1
+            });
+
+
+        calculateBookSize(
+            viewport.width,
+            viewport.height
+        );
+
+
+        /*
+           Render EVERY page.
+
+           Page 1 = front cover
+           Page 2 onward = interior
+           Last page = back cover
+        */
+
+        for(
+            let pageNumber = 1;
+            pageNumber <= totalPages;
+            pageNumber++
+        ){
+
+            setLoading(
+                "Preparing page " +
+                pageNumber +
+                " of " +
+                totalPages +
+                "…"
+            );
+
+
+            const imageURL =
+                await renderPDFPage(
+                    pageNumber,
+                    1.45
+                );
+
+
+            createPage(
+                imageURL,
+                pageNumber
+            );
+
+        }
+
+
+        /*
+           Check that the PageFlip library loaded.
+        */
+
+        if(
+            !window.St ||
+            !window.St.PageFlip
+        ){
+
+            throw new Error(
+                "The page-flip library could not be loaded."
+            );
+
+        }
+
+
+        setLoading(
+            "Preparing book…"
+        );
+
+
+        /*
+           IMPORTANT SETTINGS
+
+           showCover:true
+             → first page is a real front cover
+             → last page is a real back cover
+             → covers are displayed as single pages
+
+           usePortrait:false
+             → desktop stays as a proper two-page spread
+
+           drawShadow:true
+             → realistic page shadows
+
+           showPageCorners:true
+             → subtle corner fold when pointer approaches
+               the page corner
+
+           disableFlipByClick:false
+             → clicking/dragging pages works
+        */
+
+        pageFlip =
+            new St.PageFlip(
+                flipbook,
+                {
+
+                    width:
+                        viewport.width,
+
+                    height:
+                        viewport.height,
+
+
+                    size:
+                        "stretch",
+
+
+                    minWidth:
+                        260,
+
+                    maxWidth:
+                        900,
+
+                    minHeight:
+                        360,
+
+                    maxHeight:
+                        1300,
+
+
+                    /*
+                       This is what makes the first and
+                       last pages behave as magazine covers.
+                    */
+
+                    showCover:
+                        true,
+
+
+                    /*
+                       Desktop should remain a landscape
+                       two-page spread.
+                    */
+
+                    usePortrait:
+                        false,
+
+
+                    /*
+                       Realistic page shadows.
+                    */
+
+                    drawShadow:
+                        true,
+
+                    maxShadowOpacity:
+                        .38,
+
+
+                    /*
+                       Softer and slightly faster than the
+                       default 1000ms animation.
+                    */
+
+                    flippingTime:
+                        760,
+
+
+                    startPage:
+                        0,
+
+
+                    startZIndex:
+                        0,
+
+
+                    autoSize:
+                        true,
+
+
+                    mobileScrollSupport:
+                        true,
+
+
+                    swipeDistance:
+                        30,
+
+
+                    clickEventForward:
+                        true,
+
+
+                    useMouseEvents:
+                        true,
+
+
+                    showPageCorners:
+                        true,
+
+
+                    disableFlipByClick:
+                        false
+
+                }
+            );
+
+
+        /*
+           Load the COMPLETE PDF into PageFlip.
+
+           This is the key difference from the previous
+           versions: the front cover is NOT separated from
+           the book.
+        */
+
+        pageFlip.loadFromHTML(
+            flipbook.querySelectorAll(
+                ".page"
+            )
+        );
+
+
+        /*
+           Listen for every page turn.
+        */
+
+        pageFlip.on(
+            "flip",
+            function(){
+
+                updateNavigation();
+
+            }
+        );
+
+
+        /*
+           Listen when the orientation changes.
+        */
+
+        pageFlip.on(
+            "changeOrientation",
+            function(){
+
+                updateNavigation();
+
+            }
+        );
+
+
+        /*
+           While the page is turning, temporarily soften
+           the permanent spine shadow so it doesn't fight
+           with PageFlip's own dynamic shadow.
+        */
+
+        pageFlip.on(
+            "changeState",
+            function(event){
+
+                if(
+                    event.data ===
+                    "flipping"
+                ){
+
+                    spineShadow.style.opacity =
+                        "0";
+
+                }
+
+
+                if(
+                    event.data ===
+                    "read"
+                ){
+
+                    updateNavigation();
+
+                }
+
+            }
+        );
+
+
+        /*
+           Make the book visible only after ALL pages and
+           the PageFlip engine are ready.
+
+           This prevents the initial cover from jumping
+           from one position to another.
+        */
+
+        flipbook.classList.add(
+            "ready"
+        );
+
+
+        requestAnimationFrame(
+            function(){
+
+                flipbook.classList.add(
+                    "visible"
+                );
+
+            }
+        );
+
+
+        /*
+           Initial navigation state.
+        */
+
+        setTimeout(
+            function(){
+
+                updateNavigation();
+
+            },
+            100
+        );
+
+
+        /*
+           Hide loading screen.
+        */
+
+        setTimeout(
+            function(){
+
+                loading.style.opacity =
+                    "0";
+
+
+                setTimeout(
+                    function(){
+
+                        loading.style.display =
+                            "none";
+
+                    },
+                    350
+                );
+
+            },
+            250
+        );
+
+    }
+    catch(error){
+
+        console.error(
+            "Viewer error:",
+            error
+        );
+
+
+        showError(
+            error &&
+            error.message
+                ? error.message
+                : "Unknown error while opening the PDF."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   START
+========================================================= */
+
+startViewer();
 
 </script>
 
