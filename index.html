@@ -230,6 +230,42 @@ body{
       viewport:viewport
     }).promise;
 
+    /*
+      The PDF already has the correct page-to-page geometry:
+      there is NO extra gap at the spine.
+
+      Bake a subtle 10% inner-edge gradient into the page image.
+      Because this shading is part of the page bitmap, PageFlip
+      carries it with the page while it turns. Nothing is placed
+      over the flipping canvas.
+    */
+    if(n > 1 && n < total){
+      const edge = Math.max(22, Math.round(canvas.width * 0.055));
+
+      const g = ctx.createLinearGradient(
+        n % 2 === 1 ? canvas.width - edge : 0,
+        0,
+        n % 2 === 1 ? canvas.width : edge,
+        0
+      );
+
+      if(n % 2 === 1){
+        // Odd interior page = left page: shade its right edge.
+        g.addColorStop(0, "rgba(0,0,0,0)");
+        g.addColorStop(0.72, "rgba(0,0,0,0.035)");
+        g.addColorStop(1, "rgba(0,0,0,0.10)");
+        ctx.fillStyle = g;
+        ctx.fillRect(canvas.width-edge, 0, edge, canvas.height);
+      }else{
+        // Even interior page = right page: shade its left edge.
+        g.addColorStop(0, "rgba(0,0,0,0.10)");
+        g.addColorStop(0.28, "rgba(0,0,0,0.035)");
+        g.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, edge, canvas.height);
+      }
+    }
+
     return {
       src:canvas.toDataURL("image/jpeg",.94),
       width:base.width,
