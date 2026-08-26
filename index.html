@@ -2,110 +2,119 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Akhand Jyoti — Annual Report 2025–26</title>
-
-<!-- Stable browser builds: avoids ES-module loading problems on static hosts -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
-
 <style>
 *{box-sizing:border-box}
 html,body{width:100%;height:100%;margin:0;overflow:hidden}
 body{
-  background:radial-gradient(ellipse at center,#414141 0%,#282828 38%,#151515 78%,#0d0d0d 100%);
-  color:#fff;font-family:Arial,Helvetica,sans-serif
+ background:radial-gradient(ellipse at center,#414141 0%,#282828 38%,#151515 78%,#0d0d0d 100%);
+ color:#fff;font-family:Arial,Helvetica,sans-serif
 }
 #reader{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
-#book{
-  margin:auto;
-  width:min(94vw,1200px);
-  height:min(86vh,900px);
+#bookWrap{
+ position:relative;width:min(94vw,1200px);height:min(86vh,900px);
+ display:flex;align-items:center;justify-content:center
 }
-.page{
-  background:#fff;
-  overflow:hidden;
+#book{margin:auto;width:100%;height:100%;position:relative}
+.page{background:#fff;overflow:hidden}
+.page img{width:100%;height:100%;display:block;object-fit:contain;background:#fff;user-select:none;-webkit-user-drag:none}
+
+/* Realistic central gutter: visible only while the book is resting open. */
+#gutter{
+ position:absolute;z-index:100;top:0;bottom:0;left:50%;
+ width:34px;transform:translateX(-50%);
+ pointer-events:none;opacity:0;
+ background:linear-gradient(90deg,
+   rgba(0,0,0,0) 0%,
+   rgba(0,0,0,.05) 18%,
+   rgba(0,0,0,.20) 39%,
+   rgba(0,0,0,.30) 50%,
+   rgba(0,0,0,.20) 61%,
+   rgba(0,0,0,.05) 82%,
+   rgba(0,0,0,0) 100%);
+ transition:opacity .16s ease;
 }
-.page img{
-  width:100%;height:100%;display:block;object-fit:contain;
-  background:#fff;user-select:none;-webkit-user-drag:none
+#gutter:after{
+ content:"";position:absolute;top:0;bottom:0;left:50%;width:1px;
+ transform:translateX(-50%);background:rgba(0,0,0,.18)
 }
-.page[data-density="hard"]{background:#fff}
+#gutter.open{opacity:1}
+#gutter.cover{opacity:0}
+
 #title{
-  position:fixed;z-index:100;top:12px;left:50%;transform:translateX(-50%);
-  font-size:13px;font-weight:600;color:rgba(255,255,255,.78);
-  white-space:nowrap;pointer-events:none
+ position:fixed;z-index:500;top:12px;left:50%;transform:translateX(-50%);
+ font-size:13px;font-weight:600;color:rgba(255,255,255,.78);
+ white-space:nowrap;pointer-events:none
 }
 .edge{
-  position:fixed;z-index:200;top:50%;transform:translateY(-50%);
-  width:62px;height:118px;border:0;border-radius:14px;
-  background:rgba(18,18,18,.78);color:#fff;
-  box-shadow:0 8px 25px rgba(0,0,0,.38);
-  backdrop-filter:blur(8px);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:.18s
+ position:fixed;z-index:700;top:50%;transform:translateY(-50%);
+ width:62px;height:118px;border:0;border-radius:14px;
+ background:rgba(18,18,18,.78);color:#fff;cursor:pointer;
+ display:flex;align-items:center;justify-content:center;
+ box-shadow:0 8px 25px rgba(0,0,0,.38);backdrop-filter:blur(8px);
+ transition:background .18s,opacity .18s,transform .18s
 }
 .edge:hover{background:rgba(48,48,48,.95)}
 .edge:active{transform:translateY(-50%) scale(.95)}
 .edge span{font-size:58px;font-weight:200;line-height:1}
-#prevEdge{left:16px}
-#nextEdge{right:16px}
+#prevEdge{left:16px}#nextEdge{right:16px}
 .edge.disabled{opacity:.18;pointer-events:none}
+
 #controls{
-  position:fixed;z-index:300;bottom:14px;left:50%;transform:translateX(-50%);
-  display:flex;align-items:center;gap:6px;padding:7px 9px;
-  border-radius:12px;background:rgba(24,24,24,.9);
-  border:1px solid rgba(255,255,255,.14);
-  box-shadow:0 10px 30px rgba(0,0,0,.42);
-  backdrop-filter:blur(12px)
+ position:fixed;z-index:800;bottom:14px;left:50%;transform:translateX(-50%);
+ display:flex;align-items:center;gap:6px;padding:7px 9px;border-radius:12px;
+ background:rgba(24,24,24,.9);border:1px solid rgba(255,255,255,.14);
+ box-shadow:0 10px 30px rgba(0,0,0,.42);backdrop-filter:blur(12px)
 }
-button.ctrl{
-  width:38px;height:35px;border:1px solid rgba(255,255,255,.13);
-  border-radius:7px;background:#303030;color:#fff;cursor:pointer;font-size:17px
+.ctrl{
+ width:38px;height:35px;border:1px solid rgba(255,255,255,.13);
+ border-radius:7px;background:#303030;color:#fff;cursor:pointer;font-size:17px
 }
-button.ctrl:hover{background:#414141}
-button.ctrl:disabled{opacity:.35;cursor:not-allowed}
+.ctrl:hover{background:#414141}.ctrl:disabled{opacity:.35;cursor:not-allowed}
 #info{min-width:96px;text-align:center;font-size:12px;color:#ddd;font-variant-numeric:tabular-nums}
 #zoomLabel{width:48px;font-size:11px}
-#hint{position:fixed;z-index:100;right:16px;bottom:20px;color:rgba(255,255,255,.38);font-size:11px}
+#hint{position:fixed;z-index:500;right:16px;bottom:20px;color:rgba(255,255,255,.38);font-size:11px}
+
 #loading{
-  position:fixed;inset:0;z-index:1000;background:#151515;
-  display:flex;align-items:center;justify-content:center;
-  transition:opacity .3s
+ position:fixed;inset:0;z-index:1000;background:#151515;
+ display:flex;align-items:center;justify-content:center;transition:opacity .3s
 }
 .loader{text-align:center;color:#ddd;font-size:13px}
 .spinner{
-  width:34px;height:34px;margin:0 auto 14px;border-radius:50%;
-  border:3px solid rgba(255,255,255,.18);border-top-color:#fff;
-  animation:spin .8s linear infinite
+ width:34px;height:34px;margin:0 auto 14px;border-radius:50%;
+ border:3px solid rgba(255,255,255,.18);border-top-color:#fff;
+ animation:spin .8s linear infinite
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 #error{
-  display:none;position:fixed;inset:0;z-index:1100;
-  align-items:center;justify-content:center;text-align:center;
-  background:#151515;color:#ccc;padding:30px
+ display:none;position:fixed;inset:0;z-index:1100;
+ align-items:center;justify-content:center;text-align:center;
+ background:#151515;color:#ccc;padding:30px
 }
-#error div{max-width:650px}
-#error h3{color:#fff}
+#error div{max-width:650px}.errorTitle{color:#fff}
+
 @media(max-width:850px){
-  #book{width:100vw;height:82vh}
-  .edge{width:48px;height:92px}
-  .edge span{font-size:44px}
-  #prevEdge{left:5px}#nextEdge{right:5px}
-  #hint{display:none}
+ #bookWrap{width:100vw;height:82vh}
+ .edge{width:48px;height:92px}.edge span{font-size:44px}
+ #prevEdge{left:5px}#nextEdge{right:5px}#hint{display:none}
 }
 @media(max-width:520px){
-  #controls{bottom:7px}
-  button.ctrl{width:34px;height:33px}
-  #info{min-width:76px}
-  #title{font-size:11px;max-width:88%;overflow:hidden;text-overflow:ellipsis}
+ #controls{bottom:7px}.ctrl{width:34px;height:33px}
+ #info{min-width:76px}
+ #title{font-size:11px;max-width:88%;overflow:hidden;text-overflow:ellipsis}
 }
 </style>
 </head>
-
 <body>
+
 <div id="reader">
-  <div id="book"></div>
+ <div id="bookWrap">
+   <div id="book"></div>
+   <div id="gutter"></div>
+ </div>
 </div>
 
 <div id="title">Akhand Jyoti — Annual Report 2025–26</div>
@@ -114,240 +123,129 @@ button.ctrl:disabled{opacity:.35;cursor:not-allowed}
 <button id="nextEdge" class="edge" aria-label="Next page"><span>›</span></button>
 
 <div id="controls">
-  <button id="prev" class="ctrl" title="Previous page">‹</button>
-  <div id="info">Cover</div>
-  <button id="next" class="ctrl" title="Next page">›</button>
-  <button id="zoomOut" class="ctrl" title="Zoom out">−</button>
-  <button id="zoomLabel" class="ctrl" title="Reset zoom">100%</button>
-  <button id="zoomIn" class="ctrl" title="Zoom in">+</button>
-  <button id="full" class="ctrl" title="Fullscreen">⛶</button>
+ <button id="prev" class="ctrl">‹</button>
+ <div id="info">Cover</div>
+ <button id="next" class="ctrl">›</button>
+ <button id="zoomOut" class="ctrl">−</button>
+ <button id="zoomLabel" class="ctrl">100%</button>
+ <button id="zoomIn" class="ctrl">+</button>
+ <button id="full" class="ctrl">⛶</button>
 </div>
-
 <div id="hint">Drag the page corner or use the arrows</div>
 
 <div id="loading">
-  <div class="loader">
-    <div class="spinner"></div>
-    <div id="loadingText">Opening annual report…</div>
-  </div>
+ <div class="loader"><div class="spinner"></div><div id="loadingText">Opening annual report…</div></div>
 </div>
-
-<div id="error">
-  <div>
-    <h3>Unable to open the annual report</h3>
-    <p id="errorText">Please refresh the page and try again.</p>
-  </div>
-</div>
+<div id="error"><div><h3 class="errorTitle">Unable to open the annual report</h3><p id="errorText"></p></div></div>
 
 <script>
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+const PDF_FILE="Annual%20report%2025-26_V2.pdf";
+const book=document.getElementById("book");
+const gutter=document.getElementById("gutter");
+const loading=document.getElementById("loading");
+const loadingText=document.getElementById("loadingText");
+const errorBox=document.getElementById("error");
+const errorText=document.getElementById("errorText");
+const info=document.getElementById("info");
+const prev=document.getElementById("prev"),next=document.getElementById("next");
+const prevEdge=document.getElementById("prevEdge"),nextEdge=document.getElementById("nextEdge");
+const zoomIn=document.getElementById("zoomIn"),zoomOut=document.getElementById("zoomOut");
+const zoomLabel=document.getElementById("zoomLabel"),full=document.getElementById("full");
 
-const PDF_FILE = "Annual%20report%2025-26_V2.pdf";
+let flip=null,pdf=null,total=0,zoom=1;
 
-const book = document.getElementById("book");
-const loading = document.getElementById("loading");
-const loadingText = document.getElementById("loadingText");
-const errorBox = document.getElementById("error");
-const errorText = document.getElementById("errorText");
-const info = document.getElementById("info");
-const prev = document.getElementById("prev");
-const next = document.getElementById("next");
-const prevEdge = document.getElementById("prevEdge");
-const nextEdge = document.getElementById("nextEdge");
-const zoomIn = document.getElementById("zoomIn");
-const zoomOut = document.getElementById("zoomOut");
-const zoomLabel = document.getElementById("zoomLabel");
-const full = document.getElementById("full");
+function setLoading(t){loadingText.textContent=t}
+function showError(t){loading.style.display="none";errorText.textContent=t;errorBox.style.display="flex"}
 
-let flip = null;
-let pdf = null;
-let total = 0;
-let zoom = 1;
-
-function setLoading(text){ loadingText.textContent = text; }
-
-function showError(message){
-  loading.style.display = "none";
-  errorBox.style.display = "flex";
-  errorText.textContent = message;
+function makePage(src,index){
+ const div=document.createElement("div");
+ div.className="page";
+ // IMPORTANT: no hard-density pages. The cover uses the same soft page-turn
+ // animation as interior pages; showCover controls the single-cover layout.
+ const img=document.createElement("img");
+ img.src=src;img.alt="Annual Report page "+(index+1);
+ div.appendChild(img);book.appendChild(div)
 }
-
-function makePage(dataUrl, index){
-  const div = document.createElement("div");
-  div.className = "page";
-  if(index === 0 || index === total - 1){
-    div.dataset.density = "hard";
-  }
-  const img = document.createElement("img");
-  img.src = dataUrl;
-  img.alt = "Annual Report page " + (index + 1);
-  div.appendChild(img);
-  return div;
+async function renderPage(n){
+ const p=await pdf.getPage(n),v=p.getViewport({scale:1.35});
+ const c=document.createElement("canvas"),ctx=c.getContext("2d",{alpha:false});
+ c.width=Math.ceil(v.width);c.height=Math.ceil(v.height);
+ await p.render({canvasContext:ctx,viewport:v}).promise;
+ return c.toDataURL("image/jpeg",.90)
 }
-
-async function renderPage(pageNumber){
-  const page = await pdf.getPage(pageNumber);
-  const viewport = page.getViewport({scale: 1.35});
-
-  const canvas = document.createElement("canvas");
-  const context = canvas.getContext("2d", {alpha:false});
-  canvas.width = Math.ceil(viewport.width);
-  canvas.height = Math.ceil(viewport.height);
-
-  await page.render({
-    canvasContext: context,
-    viewport: viewport
-  }).promise;
-
-  return canvas.toDataURL("image/jpeg", 0.90);
+function updateNav(index){
+ const start=index===0,end=index===total-1;
+ if(start)info.textContent="Cover";
+ else if(end)info.textContent="Back cover";
+ else info.textContent=(index+1)+"–"+Math.min(index+2,total-1)+" / "+total;
+ prev.disabled=start;next.disabled=end;
+ prevEdge.classList.toggle("disabled",start);nextEdge.classList.toggle("disabled",end);
+ // Seam only on open spreads; never over the cover or during a turn.
+ gutter.classList.toggle("cover",start||end);
+ if(start||end)gutter.classList.remove("open");
+ else gutter.classList.add("open");
 }
-
-function updateNavigation(index){
-  const atStart = index === 0;
-  const atEnd = index === total - 1;
-
-  if(atStart) info.textContent = "Cover";
-  else if(atEnd) info.textContent = "Back cover";
-  else {
-    const first = index + 1;
-    const second = Math.min(index + 2, total - 1);
-    info.textContent = first + "–" + second + " / " + total;
-  }
-
-  prev.disabled = atStart;
-  next.disabled = atEnd;
-  prevEdge.classList.toggle("disabled", atStart);
-  nextEdge.classList.toggle("disabled", atEnd);
+function setTurning(on){
+ if(on) gutter.classList.remove("open");
+ else if(flip){
+   const i=flip.getCurrentPageIndex();
+   if(i>0&&i<total-1)gutter.classList.add("open");
+ }
 }
+function goNext(){if(flip)flip.flipNext("bottom")}
+function goPrev(){if(flip)flip.flipPrev("bottom")}
+prev.onclick=goPrev;prevEdge.onclick=goPrev;next.onclick=goNext;nextEdge.onclick=goNext;
 
-function goNext(){
-  if(flip) flip.flipNext("bottom");
+function setZoom(){
+ book.style.transform="scale("+zoom+")";
+ zoomLabel.textContent=Math.round(zoom*100)+"%"
 }
-function goPrev(){
-  if(flip) flip.flipPrev("bottom");
-}
-
-prev.onclick = goPrev;
-prevEdge.onclick = goPrev;
-next.onclick = goNext;
-nextEdge.onclick = goNext;
-
-zoomIn.onclick = ()=>{
-  zoom = Math.min(1.5, zoom + .1);
-  book.style.transform = "scale(" + zoom + ")";
-  zoomLabel.textContent = Math.round(zoom*100) + "%";
-};
-zoomOut.onclick = ()=>{
-  zoom = Math.max(.8, zoom - .1);
-  book.style.transform = "scale(" + zoom + ")";
-  zoomLabel.textContent = Math.round(zoom*100) + "%";
-};
-zoomLabel.onclick = ()=>{
-  zoom = 1;
-  book.style.transform = "scale(1)";
-  zoomLabel.textContent = "100%";
-};
-
-full.onclick = async ()=>{
-  if(!document.fullscreenElement){
-    await document.documentElement.requestFullscreen?.();
-  }else{
-    await document.exitFullscreen?.();
-  }
-};
-
-document.addEventListener("keydown", e=>{
-  if(e.key === "ArrowRight" || e.key === "PageDown") goNext();
-  if(e.key === "ArrowLeft" || e.key === "PageUp") goPrev();
-  if(e.key === "+") zoomIn.click();
-  if(e.key === "-") zoomOut.click();
-  if(e.key === "0") zoomLabel.click();
+zoomIn.onclick=()=>{zoom=Math.min(1.5,zoom+.1);setZoom()};
+zoomOut.onclick=()=>{zoom=Math.max(.8,zoom-.1);setZoom()};
+zoomLabel.onclick=()=>{zoom=1;setZoom()};
+full.onclick=async()=>{if(!document.fullscreenElement)await document.documentElement.requestFullscreen?.();else await document.exitFullscreen?.()};
+document.addEventListener("keydown",e=>{
+ if(e.key==="ArrowRight"||e.key==="PageDown")goNext();
+ if(e.key==="ArrowLeft"||e.key==="PageUp")goPrev();
+ if(e.key==="+")zoomIn.click();if(e.key==="-")zoomOut.click();if(e.key==="0")zoomLabel.click()
 });
 
 async function start(){
-  try{
-    setLoading("Loading PDF…");
-
-    // Fetch the PDF explicitly. This avoids PDF.js URL/path problems caused by
-    // spaces in the GitHub Pages filename.
-    const response = await fetch(PDF_FILE, {cache:"no-store"});
-    if(!response.ok){
-      throw new Error("PDF request returned HTTP " + response.status);
-    }
-
-    const buffer = await response.arrayBuffer();
-
-    setLoading("Reading annual report…");
-    pdf = await pdfjsLib.getDocument({data:buffer}).promise;
-    total = pdf.numPages;
-
-    if(total < 2) throw new Error("The PDF contains only one page.");
-
-    book.innerHTML = "";
-
-    // Render pages first. This makes the flipbook independent of the PDF
-    // once it starts and gives the page-flip engine ordinary HTML pages.
-    for(let i=1;i<=total;i++){
-      setLoading("Preparing page " + i + " of " + total + "…");
-      const image = await renderPage(i);
-      book.appendChild(makePage(image, i-1));
-    }
-
-    setLoading("Starting magazine…");
-
-    const first = await pdf.getPage(1);
-    const size = first.getViewport({scale:1});
-
-    if(!window.St || !window.St.PageFlip){
-      throw new Error("The page-flip library did not load.");
-    }
-
-    flip = new St.PageFlip(book, {
-      width: size.width,
-      height: size.height,
-      size: "stretch",
-      minWidth: 280,
-      maxWidth: 1000,
-      minHeight: 396,
-      maxHeight: 1350,
-      drawShadow: true,
-      maxShadowOpacity: .45,
-      flippingTime: 800,
-      usePortrait: true,
-      showCover: true,
-      autoSize: true,
-      mobileScrollSupport: false,
-      swipeDistance: 30,
-      useMouseEvents: true,
-      disableFlipByClick: false,
-      startPage: 0
-    });
-
-    flip.loadFromHTML(book.querySelectorAll(".page"));
-
-    flip.on("flip", function(e){
-      updateNavigation(e.data);
-    });
-
-    flip.on("changeOrientation", function(){
-      updateNavigation(flip.getCurrentPageIndex());
-    });
-
-    updateNavigation(0);
-
-    loading.style.opacity = "0";
-    setTimeout(()=>loading.style.display="none",350);
-
-  }catch(err){
-    console.error(err);
-    showError(
-      "The viewer could not load the PDF. " +
-      (err && err.message ? err.message : "Unknown error.")
-    );
+ try{
+  setLoading("Loading PDF…");
+  const response=await fetch(PDF_FILE,{cache:"no-store"});
+  if(!response.ok)throw new Error("PDF request returned HTTP "+response.status);
+  const buffer=await response.arrayBuffer();
+  pdf=await pdfjsLib.getDocument({data:buffer}).promise;
+  total=pdf.numPages;
+  book.innerHTML="";
+  for(let i=1;i<=total;i++){
+   setLoading("Preparing page "+i+" of "+total+"…");
+   makePage(await renderPage(i),i-1)
   }
+  const first=await pdf.getPage(1),size=first.getViewport({scale:1});
+  if(!window.St||!window.St.PageFlip)throw new Error("Page flip library did not load.");
+  flip=new St.PageFlip(book,{
+   width:size.width,height:size.height,size:"stretch",
+   minWidth:280,maxWidth:1000,minHeight:396,maxHeight:1350,
+   drawShadow:true,maxShadowOpacity:.48,
+   flippingTime:780,usePortrait:true,
+   showCover:true,autoSize:true,mobileScrollSupport:false,
+   swipeDistance:30,useMouseEvents:true,disableFlipByClick:false,startPage:0
+  });
+  flip.loadFromHTML(book.querySelectorAll(".page"));
+  flip.on("flip",e=>updateNav(e.data));
+  flip.on("changeOrientation",()=>updateNav(flip.getCurrentPageIndex()));
+  flip.on("changeState",e=>{
+    const state=e.data;
+    if(state==="flipping")setTurning(true);
+    if(state==="read")setTurning(false);
+  });
+  updateNav(0);
+  loading.style.opacity="0";setTimeout(()=>loading.style.display="none",350)
+ }catch(e){console.error(e);showError("The viewer could not load the PDF. "+(e.message||"Unknown error."))}
 }
-
 start();
 </script>
 </body>
