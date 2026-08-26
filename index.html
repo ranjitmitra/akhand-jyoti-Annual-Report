@@ -59,6 +59,11 @@ body{
     rgba(0,0,0,.035) 80%,
     transparent);
 }
+
+/* The gutter must NEVER sit on top of the page that is turning. */
+#book.flipping:after{
+  opacity:0 !important;
+}
 .nav{
   position:fixed;top:50%;
   transform:translateY(-50%);
@@ -377,8 +382,36 @@ body{
 
       flip.loadFromHTML(pages);
 
+      /*
+        Keep the center gutter hidden while the physical page is
+        rotating. It returns only after the turn is complete.
+      */
+      let gutterTimer = null;
+
+      function hideGutterDuringTurn(){
+        book.classList.add("flipping");
+        clearTimeout(gutterTimer);
+      }
+
+      function restoreGutterAfterTurn(){
+        clearTimeout(gutterTimer);
+        gutterTimer = setTimeout(function(){
+          book.classList.remove("flipping");
+        }, 80);
+      }
+
       flip.on("flip",function(e){
+        hideGutterDuringTurn();
         update(e.data);
+        restoreGutterAfterTurn();
+      });
+
+      flip.on("changeState",function(e){
+        if(e && e.data === "flipping"){
+          hideGutterDuringTurn();
+        }else{
+          restoreGutterAfterTurn();
+        }
       });
 
       flip.on("changeOrientation",function(){
